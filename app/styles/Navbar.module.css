@@ -7,7 +7,7 @@
     z-index: 10;
     background: transparent !important;
     backdrop-filter: blur(10px);
-    margin-bottom: 120px;
+    margin-bottom: 160px;
 }
 
 .inner {

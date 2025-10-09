@@ -17,8 +17,7 @@ const Navbar: React.FC = () => {
           href={`#${tab.toLowerCase()}`}
           className={classes.link}
           data-active={active === tab || undefined}
-          onClick={(e) => {
-            e.preventDefault();
+          onClick={() => {
             setActive(tab);
           }}
         >
