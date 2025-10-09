@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { HeroSection } from "./components/ui/HeroSection";
-import { Text } from "@mantine/core";
+import { Divider, Text } from "@mantine/core";
 
 export default function Home() {
   return (
@@ -63,6 +63,54 @@ export default function Home() {
           />
         </div>
       </section>
+      <Divider my={80} w={200}/>
+      <section id="features">
+        <Text 
+          component="h1"
+          style={{ textAlign: "center", fontSize: "2rem" }}
+          fw={700}
+          c={"var(--mantine-color-cyan-6)"}
+        >
+            Features
+        </Text>
+        <div style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          <Image
+            src="https://em-content.zobj.net/source/apple/96/white-medium-star_2b50.png"
+            alt="a white star"
+            width={200}
+            height={200}
+          />
+          <div>
+            <Text style={{ maxWidth: 600, textAlign: "right", marginTop: 20 }}>
+              <Text component="span" fw={700} c={"cyan"}>NextCTF </Text> offers a variety of features to enhance your CTF experience:
+              <ul style={{
+                listStylePosition: 'inside',
+                textAlign: "right",
+                paddingLeft: 0,
+              }}>
+                <li>
+                  <Text component="span" fw={700} c={"teal"}> Challenges </Text>: a wide range of challenges in categories like web security, cryptography, reverse engineering, and more.
+                </li>
+                <li>
+                  <Text component="span" fw={700} c="orange"> Contests: </Text> regularly scheduled competitions where you can compete agains others and climb the leaderboard!
+                </li>
+                <li>
+                  <Text component="span" fw={700} c="grape"> Luigi: </Text> an AI-powered assistant that can help you with hints and guidance when you are stuck on a challenge.
+                </li>
+                <li>
+                  <Text component="span" fw={700} c="red"> Track progress: </Text> keep an eye on your solved challenges, points, and ranking on the leaderboard.
+                </li>
+              </ul>
+            </Text>
+          </div>
+        </div>
+      </section>
+      <Divider my={80} w={200}/>
     </div>
   );
 }
