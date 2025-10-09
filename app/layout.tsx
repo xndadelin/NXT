@@ -3,6 +3,7 @@ import "./globals.css";
 import "@mantine/core/styles.css";
 import { createTheme, MantineProvider, ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 
+
 export const metadata: Metadata = {
   title: "NextCTF",
   description: "A Capture The Flag (CTF) platform for cybersecurity enthusiasts.",
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className={`antialiased`}>
         <MantineProvider
           theme={theme}
+          defaultColorScheme="dark"
         >
           {children}
         </MantineProvider>

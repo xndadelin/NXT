@@ -1,9 +1,18 @@
 import Image from "next/image";
+import { HeroSection } from "./components/ui/HeroSection";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      
+    <div
+      style={{ 
+        display: "flex", 
+        flexDirection: "column", 
+        alignItems: "center", 
+        justifyContent: "center", 
+        minHeight: "100vh",
+      }}
+    >
+      <HeroSection />
     </div>
   );
 }
