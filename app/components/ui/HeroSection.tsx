@@ -43,8 +43,8 @@ const HeroSection: React.FC = () => {
       </div>
 
       <div className={classes.controls}>
-        <Button className={classes.control} size="xl" color="gray">
-            Sign up!
+        <Button className={classes.control} size="xl" color="cyan">
+            Get started!
         </Button>
         <Button className={classes.control} size="xl" color="red">
             Learn more

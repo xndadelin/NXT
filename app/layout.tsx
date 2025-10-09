@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "@mantine/core/styles.css";
 import { createTheme, MantineProvider, ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
+import { Navbar } from "./components/ui/Navbar";
 
 
 export const metadata: Metadata = {
@@ -28,6 +29,7 @@ export default function RootLayout({
           theme={theme}
           defaultColorScheme="dark"
         >
+          <Navbar />
           {children}
         </MantineProvider>
       </body>
