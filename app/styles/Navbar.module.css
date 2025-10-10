@@ -34,9 +34,4 @@
         text-decoration: underline;
         text-decoration-style: wavy;
     }
-
-    [data-mantine-color-scheme] &[data-active] {
-        background-color: light-dark(var(--mantine-color-red-4), var(--mantine-color-dark-6));
-        color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-    }
 }

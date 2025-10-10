@@ -6,6 +6,7 @@ import { Burger, Container, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 import classes from "@/app/styles/Navbar.module.css"
+import Link from "next/link";
 
 const Navbar: React.FC = () => {
     const [opened, { toggle }] = useDisclosure(false);
@@ -14,7 +15,7 @@ const Navbar: React.FC = () => {
     const tabs = ["About", "Features", "Community"].map((tab) => (
         <a
           key={tab}
-          href={`#${tab.toLowerCase()}`}
+          href={`/#${tab.toLowerCase()}`}
           className={classes.link}
           data-active={active === tab || undefined}
           onClick={() => {
@@ -24,10 +25,15 @@ const Navbar: React.FC = () => {
             {tab}
         </a>
     ))
+
+
+
     return (
         <header className={classes.header}>
             <Container className={classes.inner}>
-                <span className={classes.logo}>NXT</span>
+                <Link style={{ textDecoration: 'none', color: 'inherit' }} href="/" className={classes.logo}>
+                    NXT
+                </Link>
                 <Group gap={5} visibleFrom="sm">
                     {tabs}
                 </Group>
