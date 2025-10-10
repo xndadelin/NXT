@@ -5,7 +5,7 @@ import { useMantineTheme, Tabs, Container, Group, Burger, Menu, UnstyledButton, 
 import { useDisclosure } from "@mantine/hooks";
 import cx from 'clsx'
 import Link from "next/link"; 
-import classes from "@/app/styles/Header.module.css"
+import classes from "@/app/components/header/header.module.css"
 
 
 
