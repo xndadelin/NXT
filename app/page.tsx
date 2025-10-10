@@ -1,3 +1,5 @@
+'use client';
+
 import Image from "next/image";
 import { HeroSection } from "./components/ui/HeroSection";
 import { Divider, Text } from "@mantine/core";
@@ -87,27 +89,39 @@ export default function Home() {
             height={200}
           />
           <div>
-            <Text style={{ maxWidth: 600, textAlign: "right", marginTop: 20 }}>
-              <Text component="span" fw={700} c={"cyan"}>NextCTF </Text> offers a variety of features to enhance your CTF experience:
-              <ul style={{
-                listStylePosition: 'inside',
-                textAlign: "right",
-                paddingLeft: 0,
-              }}>
-                <li>
-                  <Text component="span" fw={700} c={"teal"}> Challenges </Text>: a wide range of challenges in categories like web security, cryptography, reverse engineering, and more.
-                </li>
-                <li>
-                  <Text component="span" fw={700} c="orange"> Contests: </Text> regularly scheduled competitions where you can compete agains others and climb the leaderboard!
-                </li>
-                <li>
-                  <Text component="span" fw={700} c="grape"> Luigi: </Text> an AI-powered assistant that can help you with hints and guidance when you are stuck on a challenge.
-                </li>
-                <li>
-                  <Text component="span" fw={700} c="red"> Track progress: </Text> keep an eye on your solved challenges, points, and ranking on the leaderboard.
-                </li>
-              </ul>
+            <Text component="div" style={{ maxWidth: 600, textAlign: "right", marginTop: 20 }}>
+              <Text component="span" fw={700} c={"cyan"}>NextCTF </Text> 
+              offers a variety of features to enhance your CTF experience:
             </Text>
+            
+            <ul style={{
+              listStyle: 'none',
+              textAlign: "right",
+              paddingLeft: 0,
+              maxWidth: 600,
+              marginTop: 10
+            }}>
+              <li style={{ marginBottom: 8 }}>
+                <Text component="div">
+                  <Text component="span" fw={700} c={"teal"}>Challenges</Text>: a wide range of challenges in categories like web security, cryptography, reverse engineering, and more.
+                </Text>
+              </li>
+              <li style={{ marginBottom: 8 }}>
+                <Text component="div">
+                  <Text component="span" fw={700} c="orange">Contests:</Text> regularly scheduled competitions where you can compete against others and climb the leaderboard!
+                </Text>
+              </li>
+              <li style={{ marginBottom: 8 }}>
+                <Text component="div">
+                  <Text component="span" fw={700} c="grape">Luigi:</Text> an AI-powered assistant that can help you with hints and guidance when you are stuck on a challenge.
+                </Text>
+              </li>
+              <li style={{ marginBottom: 8 }}>
+                <Text component="div">
+                  <Text component="span" fw={700} c="red">Track progress:</Text> keep an eye on your solved challenges, points, and ranking on the leaderboard.
+                </Text>
+              </li>
+            </ul>
           </div>
         </div>
       </section>

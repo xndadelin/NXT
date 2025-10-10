@@ -6,9 +6,11 @@ import { upperFirst, useToggle } from "@mantine/hooks";
 import OAuth from "../utils/auth/oauth";
 import { signInWithPass, signUpWithPass } from "../utils/auth/pass";
 import { notifications } from "@mantine/notifications";
+import useUser from "../utils/queries/user/useUser";
 
 const Signin: React.FC = () => {
     const [type, toggle] = useToggle(['login', 'register'])
+    const { user, loading, error } = useUser();
 
     const form = useForm({
         initialValues: {

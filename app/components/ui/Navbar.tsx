@@ -26,8 +26,6 @@ const Navbar: React.FC = () => {
         </a>
     ))
 
-
-
     return (
         <header className={classes.header}>
             <Container className={classes.inner}>
