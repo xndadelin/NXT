@@ -3,6 +3,8 @@ import "./globals.css";
 import "@mantine/core/styles.css";
 import { createTheme, MantineProvider, ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import { Navbar } from "./components/ui/Navbar";
+import { Notifications } from "@mantine/notifications";
+import '@mantine/notifications/styles.css';
 
 
 export const metadata: Metadata = {
@@ -31,6 +33,7 @@ export default function RootLayout({
         >
           <Navbar />
           {children}
+          <Notifications position={"bottom-right"} />
         </MantineProvider>
       </body>
     </html>
