@@ -9,6 +9,7 @@ import { notifications } from "@mantine/notifications";
 import useUser from "../utils/queries/user/useUser";
 import { Error } from "../components/ui/Error";
 import { useRouter } from "next/navigation";
+import Loading from "../components/ui/Loading";
 const Signin: React.FC = () => {
     const [type, toggle] = useToggle(['login', 'register'])
     const router = useRouter();
@@ -26,8 +27,8 @@ const Signin: React.FC = () => {
         },
     });
 
-    if(loading) return <Text>Loading...</Text>
-    console.log(error)
+    if(loading) return <Loading />
+
     if(error) return <Error number={500} />
 
     if(user) {
