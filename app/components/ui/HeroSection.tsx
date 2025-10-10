@@ -1,6 +1,7 @@
 import { Button, Container, Text, Title } from "@mantine/core";
 import classes from "@/app/styles/HeroSection.module.css";
 import { Dots } from "./Dots";
+import Link from "next/link";
 
 const HeroSection: React.FC = () => {
   return (
@@ -43,9 +44,11 @@ const HeroSection: React.FC = () => {
       </div>
 
       <div className={classes.controls}>
-        <Button className={classes.control} size="xl" color="cyan">
-            Get started!
-        </Button>
+        <Link href="/auth" style={{ textDecoration: 'none', marginRight: 20 }}>
+          <Button className={classes.control} size="xl" color="cyan">
+              Get started!
+          </Button>
+        </Link>
         <Button className={classes.control} size="xl" color="red">
             Learn more
         </Button>
