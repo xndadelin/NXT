@@ -24,6 +24,11 @@ export default function useUser() {
 
         fetchUser();
     }, []);
+
+    if (error === 'Auth session missing!') {
+        setUser(null);
+        setError(null);
+    }
     
     return { user, loading, error };
 }

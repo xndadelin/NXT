@@ -7,11 +7,12 @@ import OAuth from "../utils/auth/oauth";
 import { signInWithPass, signUpWithPass } from "../utils/auth/pass";
 import { notifications } from "@mantine/notifications";
 import useUser from "../utils/queries/user/useUser";
-
+import { Error } from "../components/ui/Error";
+import { useRouter } from "next/navigation";
 const Signin: React.FC = () => {
     const [type, toggle] = useToggle(['login', 'register'])
+    const router = useRouter();
     const { user, loading, error } = useUser();
-
     const form = useForm({
         initialValues: {
             email: '',
@@ -24,6 +25,15 @@ const Signin: React.FC = () => {
             password: (val) => (val.length < 8 ? "Password should include at least 8 characters." : null),
         },
     });
+
+    if(loading) return <Text>Loading...</Text>
+    console.log(error)
+    if(error) return <Error number={500} />
+
+    if(user) {
+        router.push('/');
+        return null;
+    }
 
     const SlackIcon = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/2048px-Slack_icon_2019.svg.png";
     const DiscordIcon = "https://www.svgrepo.com/show/353655/discord-icon.svg"
@@ -67,6 +77,23 @@ const Signin: React.FC = () => {
                     message: (error as Error).message || 'An error occured during registration.',
                     color: 'red'
                 })
+                return;
+            }
+        } else {
+            try {
+                await signInWithPass(form.values.email, form.values.password);
+                notifications.show({
+                    title: 'Success',
+                    message: 'Login successful!!! YEY!',
+                    color: 'green'
+                })
+                router.push('/')
+            } catch (error) {
+                notifications.show({
+                    title: 'Error',
+                    message: (error as Error).message || 'An error occured during login.',
+                    color: 'red'
+                });
                 return;
             }
         }
