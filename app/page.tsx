@@ -2,10 +2,24 @@
 
 import Image from "next/image";
 import { HeroSection } from "./components/ui/HeroSection";
-import { Divider, Text } from "@mantine/core";
+import { Divider, SimpleGrid, Text, Title, Card, ThemeIcon, Container, Group, Stack, Box, Paper, Button } from "@mantine/core";
 import useUser from "./utils/queries/user/useUser";
 import Loading from "./components/ui/Loading";
 import { Error } from "./components/ui/Error";
+import { IconAward, IconBook, IconBrain, IconBrandDocker, IconChartBar, IconInfoCircle, IconList, IconRocket, IconShield, IconUserCode } from "@tabler/icons-react";
+import Link from "next/link";
+
+function FeatureCard({ icon, color, title, description }: { icon: React.ReactNode, color: string, title:string, description: string }) {
+  return (
+    <Card p="lg" radius="md" withBorder>
+      <ThemeIcon size={50} radius="md" color={color} variant="light" mb={"md"}>
+        {icon}
+      </ThemeIcon>
+      <Text fw={500} size="lg" mb="xs">{title}</Text>
+      <Text size="sm" c="dimmed">{description}</Text>
+    </Card>
+  )
+}
 
 export default function Home() {
   const { user, loading, error } = useUser();
@@ -46,150 +60,135 @@ export default function Home() {
             <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-5 3.66a1 1 0 0 0 -1 1v5.585l-2.293 -2.292l-.094 -.083a1 1 0 0 0 -1.32 1.497l4 4c.028 .028 .057 .054 .094 .083l.092 .064l.098 .052l.081 .034l.113 .034l.112 .02l.117 .006l.115 -.007l.114 -.02l.142 -.044l.113 -.054l.111 -.071a.939 .939 0 0 0 .112 -.097l4 -4l.083 -.094a1 1 0 0 0 -1.497 -1.32l-2.293 2.291v-5.584l-.007 -.117a1 1 0 0 0 -.993 -.883z" />
           </svg>
           <section id="about">
-            <Text
-              component="h1"
-              style={{ textAlign: "center", fontSize: "2rem" }}
-              fw={700}
-              c={"var(--mantine-color-cyan-6)"}
-            >
-              About NextCTF
-            </Text>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 100,
-                gap: 200,
-              }}
-            >
-              <Text style={{ maxWidth: 600, textAlign: "left", marginTop: 20 }}>
-                <Text component="span" fw={700} c="cyan">
-                  NextCTF{" "}
+            <Container size="lg" mb={80}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
+                <Title order={2} ta="center" fw={800} size={36}>
+                  About NextCTF
+                </Title>
+                
+                <Text size="xl" ta="center" style={{ maxWidth: '700px', lineHeight: 1.6 }}>
+                  NextCTF is a cybersecurity training platform where participants 
+                  solve challenges to develop and improve their security skills.
                 </Text>
-                is a{" "}
-                <Text component="span" fw={700} c="red">
-                  Capture The Flag (CTF)
-                </Text>{" "}
-                platform designed to provide cybersecurity enthusiasts with
-                challenges and competitions to up their skills! For begginers:
-                CTF is a type of{" "}
-                <Text component="span" fw={700}>
-                  cybersecurity contest
-                </Text>{" "}
-                where participants solve security related challenges to earn
-                points, that can range from{" "}
-                <Text component="span" c="teal" fw={700}>
-                  {" "}
-                  basic tasks like finding hidden flags in code{" "}
-                </Text>{" "}
-                to{" "}
-                <Text component="span" c="grape" fw={700}>
-                  {" "}
-                  complex problems involving cryptography, web security, and
-                  reverse engineering.
-                </Text>{" "}
-                Points are{" "}
-                <Text component="span" c="orange" fw={700}>
-                  dynamically allocated
-                </Text>{" "}
-                based on the number of people who have solved the challenge,
-                making it more rewarding to solve harder problems.
-              </Text>
-              <Image
-                src="https://em-content.zobj.net/source/apple/114/triangular-flag-on-post_1f6a9.png"
-                alt="a triangular red flag on post"
-                width={200}
-                height={200}
-              />
-            </div>
-          </section>
-          <Divider my={80} w={200} />
-          <section id="features">
-            <Text
-              component="h1"
-              style={{ textAlign: "center", fontSize: "2rem" }}
-              fw={700}
-              c={"var(--mantine-color-cyan-6)"}
-            >
-              Features
-            </Text>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Image
-                src="https://em-content.zobj.net/source/apple/96/white-medium-star_2b50.png"
-                alt="a white star"
-                width={200}
-                height={200}
-              />
-              <div>
-                <Text
-                  component="div"
-                  style={{ maxWidth: 600, textAlign: "right", marginTop: 20 }}
-                >
-                  <Text component="span" fw={700} c={"cyan"}>
-                    NextCTF{" "}
-                  </Text>
-                  offers a variety of features to enhance your CTF experience:
-                </Text>
-
-                <ul
-                  style={{
-                    listStyle: "none",
-                    textAlign: "right",
-                    paddingLeft: 0,
-                    maxWidth: 600,
-                    marginTop: 10,
-                  }}
-                >
-                  <li style={{ marginBottom: 8 }}>
-                    <Text component="div">
-                      <Text component="span" fw={700} c={"teal"}>
-                        Challenges
-                      </Text>
-                      : a wide range of challenges in categories like web
-                      security, cryptography, reverse engineering, and more.
+                
+                <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xl" style={{ width: '100%' }}>
+                  <Paper p="md" radius="md" withBorder>
+                    <ThemeIcon 
+                      size={48} 
+                      radius="md" 
+                      color="blue" 
+                      variant="light" 
+                      mb="md"
+                    >
+                      <IconShield size={24} />
+                    </ThemeIcon>
+                    <Text fw={600} mb="xs">What is a CTF?</Text>
+                    <Text size="sm" c="dimmed">
+                      "Capture The Flag" competitions are cybersecurity contests where 
+                      you solve challenges to find hidden flags and earn points.
                     </Text>
-                  </li>
-                  <li style={{ marginBottom: 8 }}>
-                    <Text component="div">
-                      <Text component="span" fw={700} c="orange">
-                        Contests:
-                      </Text>{" "}
-                      regularly scheduled competitions where you can compete
-                      against others and climb the leaderboard!
+                  </Paper>
+                  
+                  <Paper p="md" radius="md" withBorder>
+                    <ThemeIcon 
+                      size={48} 
+                      radius="md" 
+                      color="grape" 
+                      variant="light" 
+                      mb="md"
+                    >
+                      <IconBrain size={24} />
+                    </ThemeIcon>
+                    <Text fw={600} mb="xs">Learn by doing</Text>
+                    <Text size="sm" c="dimmed">
+                      Practice with web security, cryptography, reverse engineering, 
+                      and forensics challenges designed for all skill levels.
                     </Text>
-                  </li>
-                  <li style={{ marginBottom: 8 }}>
-                    <Text component="div">
-                      <Text component="span" fw={700} c="grape">
-                        Luigi:
-                      </Text>{" "}
-                      an AI-powered assistant that can help you with hints and
-                      guidance when you are stuck on a challenge.
+                  </Paper>
+                  
+                  <Paper p="md" radius="md" withBorder>
+                    <ThemeIcon 
+                      size={48} 
+                      radius="md" 
+                      color="teal" 
+                      variant="light" 
+                      mb="md"
+                    >
+                      <IconAward size={24} />
+                    </ThemeIcon>
+                    <Text fw={600} mb="xs">Compete</Text>
+                    <Text size="sm" c="dimmed">
+                      Join competitions, climb the leaderboard, and track your 
+                      progress as you develop your cybersecurity expertise.
                     </Text>
-                  </li>
-                  <li style={{ marginBottom: 8 }}>
-                    <Text component="div">
-                      <Text component="span" fw={700} c="red">
-                        Track progress:
-                      </Text>{" "}
-                      keep an eye on your solved challenges, points, and ranking
-                      on the leaderboard.
-                    </Text>
-                  </li>
-                </ul>
+                  </Paper>
+                </SimpleGrid>
               </div>
-            </div>
+            </Container>
           </section>
           <Divider my={80} w={200} />
+          <Container id="features">
+            <Title order={2} ta={"center"} size={36} mb="lg">
+              Why choose NextCTF?
+            </Title>
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="xl">
+              <FeatureCard
+                icon={<IconShield size={32} />}
+                color="cyan"
+                title="Various challenges"
+                description="NextCTF offers a wide range of challenges across multiple categories, including   web security, cryptography, reverse engineering, and more."
+              />
+              <FeatureCard 
+                icon={<IconAward size={32} />}
+                color="orange"
+                title="Competitions"
+                description="Participate in regular CTF competitions hosted on the platform to test your skills against others, climb the leaderboard, and win prizes!"
+              />
+              <FeatureCard 
+                icon={<IconBrain size={32} />}
+                color="grape"
+                title="AI-Powered assistant"
+                description="Get help from Luigi! He provides hints, explanations, and guidance on solving challenges, making it easier for beginners to learn and improve their skills."
+              />
+              <FeatureCard
+                icon={<IconUserCode size={32} />}
+                color="blue"
+                title="Skill progression"
+                description="Track your progress over time with statistics and performance metrics, helping you identify areas for improvement."
+              />
+              <FeatureCard
+                icon={<IconRocket size={32} />}
+                color="teal"
+                title="Dynamic scoring"
+                description="Earn more points for solving harder challenges that fewer people have solved, making it more rewarding to tackle difficult problems."
+              />
+              <FeatureCard
+                icon={<IconBook size={32} />}
+                color="red"
+                title="Learning resources"
+                description="Access a variety of learning materials, tutorials, and guides to help you improve your cybersecurity skills."
+              />
+
+            </SimpleGrid>
+          </Container>
+          <Divider my={80} w={200} />
+          <Container style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '2rem', marginBottom: 80 }}>
+            <Text style={{ fontSize: 40 }}>
+              We know it's tough, but with NextCTF, we've made it simple and fun!
+            </Text>
+            <Image src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/e4a06e09270ddc83e06c3471a97c8701f7466efe_laptop_work.svg" alt="laptop working" width={600} height={400} />
+          </Container>
+          <Divider my={80} w={200} />
+          <Container style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '2rem', marginBottom: 80, backgroundColor: '#15aabf', color: 'light-dark(var(--mantine-color-dark-0), var(--mantine-color-dark-7))', borderRadius: '16', padding: 40 }}>
+            <Title order={3} style={{ fontSize: '2rem'}}>🤠 So, what are you waiting for? Join us and start today!</Title>
+            <Text style={{fontSize: '1.2rem'}}>It would be our pleasure to have you on board! We are still in beta, so if you have any feedback, please let us know! We are always looking for ways to improve our platform and make it better for you.
+              <Link color="dark" href="/auth">
+                <Button color="cyan" style={{ marginTop: 20}}>
+                  Sign up now, it's free!
+                </Button>
+              </Link>
+            </Text>
+          </Container>
         </div>
       ) : (
         <div>welcome lmao</div>
