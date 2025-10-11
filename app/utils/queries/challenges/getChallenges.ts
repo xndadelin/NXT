@@ -6,15 +6,10 @@ import { createClient } from "../../supabase/client";
 export interface Challenge {
     id: string;
     title: string;
-    description: string;
     difficulty: string;
     category: string;
     points: number;
-    resource?: string;
-    mitre?: string;
-    case_insensitive: boolean;
     created_at: string;
-    flag?: string;
 }
 
 export default function useChallenges() {
