@@ -1,6 +1,6 @@
 'use client';
 
-import { Container, Button, Table, Badge, Group, Text, TextInput, Menu, Checkbox, Divider } from "@mantine/core";
+import { Container, Button, Table, Badge, Group, Text, TextInput, Menu, Checkbox, Divider, Pagination } from "@mantine/core";
 import Link from "next/link";
 import useChallenges from "../utils/queries/challenges/getChallenges";
 import { Error } from "../components/ui/Error";
@@ -16,6 +16,8 @@ function Challenges() {
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [filterDifficulty, setFilterDifficulty] = useState<string[]>([])
     const [filterCategory, setFilterCategory] = useState<string[]>([]);
+    const [activePage, setActivePage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         setTimeout(() => {
@@ -26,6 +28,7 @@ function Challenges() {
                 }
             });
             setSortedChallenges(filteredChallenges);
+            setActivePage(1);
         }, 300);
     }, [searchTerm]);
 
@@ -44,6 +47,7 @@ function Challenges() {
                 return matchesSearch && matchesCategory && matchesDifficulty;
             });
             setSortedChallenges(filteredChallenges);
+            setActivePage(1);
         }
     }, [challenges, searchTerm, filterCategory, filterDifficulty])
 
@@ -83,6 +87,10 @@ function Challenges() {
     const displayChallenges = (sortedChallenges && sortedChallenges.length > 0) 
         ? sortedChallenges 
         : challenges;
+
+    const paginatedChallenges = displayChallenges.slice((activePage - 1) * itemsPerPage, activePage * itemsPerPage);
+
+    const totalPages = Math.max(1, Math.ceil(displayChallenges.length / itemsPerPage));
     
     const rows = displayChallenges.map((challenge, index) => (
         <Table.Tr key={challenge.id} style={{cursor: 'pointer'}} onClick={() => window.location.href = `/challenges/${challenge.id}`}>
@@ -139,6 +147,7 @@ function Challenges() {
                 setSortedChallenges(newSortedChallenges);
                 break;
         }
+        setActivePage(1);
     }
 
     const renderSortIcon = (colIndex: number) => {
@@ -278,6 +287,20 @@ function Challenges() {
                     {rows}
                 </Table.Tbody>
             </Table>
+                <Group style={{ width: "100%" }}>
+                <Text size="sm" c="dimmed">
+                    Showing {paginatedChallenges.length} of {displayChallenges.length} challenges
+                </Text>
+                <div style={{ marginLeft: "auto" }}>
+                    <Pagination 
+                        size="md" 
+                        withEdges 
+                        total={totalPages} 
+                        value={activePage}
+                        onChange={setActivePage}
+                    />
+                </div>
+            </Group>
         </Container>
     )
 }
