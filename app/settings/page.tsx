@@ -43,7 +43,7 @@ export default function SettingsPage() {
         if (user && user.email) {
             form.setFieldValue('email', user.email);
         }
-    }, [user, form])
+    }, [user])
 
     if (loading) return <Loading />;
     if (!user) return <Error number={401} />;

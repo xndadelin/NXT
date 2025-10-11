@@ -77,5 +77,20 @@ export async function submitFlag(challengeId: string, flag: string) {
       }
     }
   }
+  if(isCorrect) {
+    const { error: userError, data: userData } = await supabase.from('users').select('points').eq('id', id).single();
+    const { error: challengeError, data: challengeData } = await supabase.from('challenges').select('points').eq('id', challengeId).single();
+    if(challengeError) {
+      throw new Error("Failed to fetch challenge points");
+    }
+    if(userError) {
+      throw new Error("Failed to fetch user points");
+    }
+    const totalPoints = (userData?.points || 0 ) + (challengeData?.points || 0);
+    const { error: updateUserError } = await supabase.from('users').update({ points: totalPoints }).eq('id', id);
+    if(updateUserError) {
+      throw new Error("Failed to update user points");
+    }
+  }
   return isCorrect;
 }
