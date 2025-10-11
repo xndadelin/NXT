@@ -10,10 +10,18 @@ import useUser from "../utils/queries/user/useUser";
 import { Error } from "../components/ui/Error";
 import { useRouter } from "next/navigation";
 import Loading from "../components/ui/Loading";
+import { useEffect } from "react";
 const Signin: React.FC = () => {
     const [type, toggle] = useToggle(['login', 'register'])
     const router = useRouter();
     const { user, loading, error } = useUser();
+
+    useEffect(() => {
+      if (user) {
+        router.push("/");
+      }
+    }, [user, router]);
+
     const form = useForm({
         initialValues: {
             email: '',
@@ -30,11 +38,6 @@ const Signin: React.FC = () => {
     if(loading) return <Loading />
 
     if(error) return <Error number={500} />
-
-    if(user) {
-        router.push('/');
-        return null;
-    }
 
     const SlackIcon = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/2048px-Slack_icon_2019.svg.png";
     const DiscordIcon = "https://www.svgrepo.com/show/353655/discord-icon.svg"

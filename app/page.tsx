@@ -10,7 +10,7 @@ import { Error } from "./components/ui/Error";
 export default function Home() {
   const { user, loading, error } = useUser();
 
-  if (loading) return <Loading />;
+  if (loading) return null;
 
   if (error) return <Error number={500} />;
 
@@ -25,7 +25,13 @@ export default function Home() {
       }}
     >
       {!user ? (
-        <div>
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "calc(100vh - 300px)",
+          }}>
           <HeroSection />
           <svg
             style={{ marginTop: 140, marginBottom: 40 }}

@@ -23,7 +23,18 @@ export default function useUser() {
         }
 
         fetchUser();
+
+        const supabase = createClient();
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        })
+
+        return () => {
+            subscription.unsubscribe();
+        }
+
     }, []);
+
 
     if (error === 'Auth session missing!') {
         setUser(null);

@@ -6,32 +6,63 @@ import { useDisclosure } from "@mantine/hooks";
 import cx from 'clsx'
 import Link from "next/link"; 
 import classes from "@/app/components/header/header.module.css"
+import logout from "@/app/utils/auth/logout";
+import { notifications } from "@mantine/notifications";
+import { useRouter } from "next/navigation";
+import useUser from "@/app/utils/queries/user/useUser";
+import { Error } from "../ui/Error";
 
 
 
 export default function Header() {
-    const theme = useMantineTheme();
     const [opened, { toggle }] = useDisclosure(false);
-
-    const user = {
-        name: 'floricica',
-        email: 'floricica@next.ro',
-        image: 'https://avatars.githubusercontent.com/u/1486366?v=4'
-    }
+    const [loading, setLoading] = useState<boolean>(false);
+    const router = useRouter();
+    const { user: user_data, loading: userLoading, error: userError } = useUser();
+    const [error, setError] = useState<string | null>(null)
 
     const [userMenuOpened, setUserMenuOpened] = useState<boolean>(false);
+    if (userLoading) return null;
+    if (userError) return <Error number={500} />
+    
+    const user = {
+        name: user_data?.email?.split('@')[0] || 'Noob',
+        image: user_data?.user_metadata?.avatar_url || null,
+    }
+
     const tabs = ["Home", "Challenges", "Leaderboard", "Learn", "Community"].map((tab) => (
         <Tabs.Tab value={tab} key={tab}>
             {tab}
         </Tabs.Tab>
     ))
 
+    const onLogout = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            await logout();
+            notifications.show({
+                title: 'Success',
+                message: 'You have been logged out successfully.',
+                color: 'green',
+            })
+            router.push('/');
+        } catch (error) {
+            setError(String(error));
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    if (error) return <Error number={500} />
+
+
     return (
         <div className={classes.header}>
             <Container className={classes.inner}>
                 <Group justify="space-between" align="center">
 
-                    <Link style={{ textDecoration: 'none', color: 'inherit' }} href="/" className={classes.logo}>
+                    <Link style={{ textDecoration: 'none', color: 'inherit', margin: 0, padding: 0 }} href="/" className={classes.logo}>
                         NXT
                     </Link>
 
@@ -52,7 +83,7 @@ export default function Header() {
                         <Menu.Dropdown>
                             <Menu.Label>Settings</Menu.Label>
                             <Menu.Item leftSection={<IconSettings size={16} stroke={1.5} />}>Account settings</Menu.Item>
-                            <Menu.Item leftSection={<IconSettings size={16} stroke={1.5} />}>Logout</Menu.Item>
+                            <Menu.Item color="red" onClick={onLogout} disabled={loading}>Logout</Menu.Item>
                         </Menu.Dropdown>
                     </Menu>
                 </Group>
