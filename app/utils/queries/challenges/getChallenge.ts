@@ -1,0 +1,49 @@
+'use client';
+
+import { useEffect, useState } from "react";
+import { createClient } from "../../supabase/client";
+
+export interface Challenge {
+    id: string;
+    title: string;
+    difficulty: string;
+    category: string;
+    points: number;
+    created_at: string;
+    description: string;
+    resource: string;
+    mitre: string;
+}
+
+export default function useChallenges(id: string) {
+    const [challenge, setChallenge] = useState<Challenge | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    
+    useEffect(() => {
+        async function fetchChallenge() {
+            try {
+                const supabase = createClient();
+                const { data, error } = await supabase
+                    .from('challenges')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+                if (error) {
+                    throw error;
+                }
+
+                setChallenge(data || null);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : String(err));
+                console.error('Error fetching challenges:', err);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchChallenge();
+    }, [id]);
+
+    return { challenge, loading, error };
+}
