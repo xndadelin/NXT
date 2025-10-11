@@ -1,5 +1,6 @@
 import { createClient } from "@/app/utils/supabase/client";
 import { Provider } from "@supabase/supabase-js";
+import { generateRandomUsername, checkUser } from "./pass";
 
 const OAuth = async(provider: Provider) => {
     const supabase = await createClient()
