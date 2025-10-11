@@ -13,8 +13,6 @@ import { Error } from "../ui/Error";
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect } from "react";
 
-
-
 export default function Header() {
     const [opened, { toggle }] = useDisclosure(false);
     const router = useRouter();
@@ -40,7 +38,7 @@ export default function Header() {
     if (userError) return <Error number={500} />
     
     const user = {
-        name: user_data?.email?.split('@')[0] || 'Noob',
+        name: user_data?.user_metadata?.username,
         image: user_data?.user_metadata?.avatar_url || null,
     }
 
@@ -100,7 +98,9 @@ export default function Header() {
                         </Menu.Target>
                         <Menu.Dropdown>
                             <Menu.Label>Settings</Menu.Label>
-                            <Menu.Item leftSection={<IconSettings size={16} stroke={1.5} />}>Account settings</Menu.Item>
+                            <Link href="/settings" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <Menu.Item leftSection={<IconSettings size={16} stroke={1.5} />}>Account settings</Menu.Item>
+                            </Link>
                             <Menu.Item color="red" onClick={onLogout} disabled={loading}>Logout</Menu.Item>
                         </Menu.Dropdown>
                     </Menu>

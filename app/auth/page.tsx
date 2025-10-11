@@ -110,13 +110,13 @@ const Signin: React.FC = () => {
                 Welcome to NextCTF, {type} with:
             </Text>
             <Group grow mb="md" mt="md">
-                <Button onClick={() => OAuth("slack_oidc")} leftSection={<Image src={SlackIcon} alt="Slack" style={{ width: 18, height: 18 }} />} variant="default" radius="xl" size="md">
+                <Button onClick={() => OAuth("slack_oidc")} leftSection={<Image src={SlackIcon} width={18} height={18} alt="Slack" style={{ width: 18, height: 18 }} />} variant="default" radius="xl" size="md">
                     Slack
                 </Button>
-                <Button onClick={() => OAuth("discord")} leftSection={<Image src={DiscordIcon} alt="Discord" style={{ width: 18, height: 18 }} />} variant="default" radius="xl" size="md">
+                <Button onClick={() => OAuth("discord")} leftSection={<Image src={DiscordIcon} width={18} height={18} alt="Discord" style={{ width: 18, height: 18 }} />} variant="default" radius="xl" size="md">
                     Discord
                 </Button>
-                <Button onClick={() => OAuth("github")} leftSection={<Image src={GitHubIcon} alt="GitHub" style={{ width: 18, height: 18 }} />} variant="default" radius="xl" size="md">
+                <Button onClick={() => OAuth("github")} leftSection={<Image src={GitHubIcon} width={18} height={18} alt="GitHub" style={{ width: 18, height: 18 }} />} variant="default" radius="xl" size="md">
                     GitHub
                 </Button>
             </Group>    
