@@ -7,6 +7,7 @@ import { Error } from "../components/ui/Error";
 import { useState, useEffect } from "react";
 import { IconArrowDown, IconArrowUp, IconArrowsUpDown, IconFilter, IconSettings } from "@tabler/icons-react";
 import useUser from "../utils/queries/user/useUser";
+import getSolvedChallenges from "../utils/queries/challenges/getSolved";
 
 function Challenges() {
     const { challenges, loading, error } = useChallenges();
@@ -17,6 +18,7 @@ function Challenges() {
     const [filterDifficulty, setFilterDifficulty] = useState<string[]>([])
     const [filterCategory, setFilterCategory] = useState<string[]>([]);
     const [activePage, setActivePage] = useState(1);
+    const [solvedChallenges, setSolvedChallenges] = useState<string[]>([]);
     const itemsPerPage = 10;
 
     useEffect(() => {
@@ -56,6 +58,22 @@ function Challenges() {
             setSortedChallenges([...challenges]);
         }
     }, [challenges]);
+    useEffect(() => {
+        const fetchSolvedChallenges = async () => {
+            try {
+                if (user?.id) {
+                    const challs = await getSolvedChallenges(user.id);
+                    setSolvedChallenges(challs);
+                } else {
+                    setSolvedChallenges([]);
+                }
+            } catch (error) {
+                setSolvedChallenges([]);
+            }
+        };
+        
+        fetchSolvedChallenges();
+    }, [user])
 
     if (loading) return null;
     if (error) return <Error number={500} />;   
@@ -101,6 +119,7 @@ function Challenges() {
             </Table.Td>
             <Table.Td>{challenge.category}</Table.Td>
             <Table.Td>{challenge.points}</Table.Td>
+            <Table.Td>{solvedChallenges.includes(challenge.id) ? '✅' : '❌'}</Table.Td>
         </Table.Tr>
     ))
 
@@ -280,6 +299,9 @@ function Challenges() {
                                 <Text>Points</Text>
                                 {renderSortIcon(4)}
                             </Group>
+                        </Table.Th>
+                        <Table.Th>
+                            <Text>Solved</Text>
                         </Table.Th>
                     </Table.Tr>
                 </Table.Thead>
