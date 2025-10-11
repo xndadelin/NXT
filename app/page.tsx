@@ -2,11 +2,10 @@
 
 import Image from "next/image";
 import { HeroSection } from "./components/ui/HeroSection";
-import { Divider, SimpleGrid, Text, Title, Card, ThemeIcon, Container, Group, Stack, Box, Paper, Button } from "@mantine/core";
+import { Divider, SimpleGrid, Text, Title, Card, ThemeIcon, Container, Paper, Button } from "@mantine/core";
 import useUser from "./utils/queries/user/useUser";
-import Loading from "./components/ui/Loading";
 import { Error } from "./components/ui/Error";
-import { IconAward, IconBook, IconBrain, IconBrandDocker, IconChartBar, IconInfoCircle, IconList, IconRocket, IconShield, IconUserCode } from "@tabler/icons-react";
+import { IconAward, IconBook, IconBrain, IconRocket, IconShield, IconUserCode } from "@tabler/icons-react";
 import Link from "next/link";
 
 function FeatureCard({ icon, color, title, description }: { icon: React.ReactNode, color: string, title:string, description: string }) {
