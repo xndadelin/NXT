@@ -23,8 +23,6 @@ function FeatureCard({ icon, color, title, description }: { icon: React.ReactNod
 export default function Home() {
   const { user, loading, error } = useUser();
 
-  if (loading) return null;
-
   if (error) return <Error number={500} />;
 
   return (

@@ -13,7 +13,7 @@ import Loading from "./Loading";
 import { Error } from "./Error";
 
 const Navbar: React.FC = () => {
-  const { user, loading, error } = useUser();
+  const { user, error } = useUser();
   const [opened, { toggle }] = useDisclosure(false);
   const [active, setActive] = useState("Home");
 
@@ -31,7 +31,6 @@ const Navbar: React.FC = () => {
     </a>
   ));
 
-  if (loading) return <Loading />;
   if (error) return <Error number={500} />;
 
   return !user ? (

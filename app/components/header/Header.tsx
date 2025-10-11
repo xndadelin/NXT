@@ -17,12 +17,12 @@ import { useEffect } from "react";
 
 export default function Header() {
     const [opened, { toggle }] = useDisclosure(false);
-    const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
-    const { user: user_data, loading: userLoading, error: userError } = useUser();
+    const { user: user_data, error: userError } = useUser();
     const [error, setError] = useState<string | null>(null)
     const [activeTab, setActiveTab] = useState<string>('Home');
     const pathname = usePathname();
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         const path = pathname === "/" ? "Home" : pathname.split("/")[1];
@@ -37,7 +37,6 @@ export default function Header() {
     }, [pathname]);
 
     const [userMenuOpened, setUserMenuOpened] = useState<boolean>(false);
-    if (userLoading) return null;
     if (userError) return <Error number={500} />
     
     const user = {
