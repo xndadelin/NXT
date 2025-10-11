@@ -17,6 +17,7 @@ export default async function getSolvedChallenges(userId: string) {
     
         return data ? data.map(challenge => challenge.challenge) : [];
     } catch (err) {
+        console.error(err) // lint purposes
         return [];
     }
 }

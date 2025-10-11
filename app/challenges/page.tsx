@@ -5,15 +5,23 @@ import Link from "next/link";
 import useChallenges from "../utils/queries/challenges/getChallenges";
 import { Error } from "../components/ui/Error";
 import { useState, useEffect } from "react";
-import { IconArrowDown, IconArrowUp, IconArrowsUpDown, IconFilter, IconSettings } from "@tabler/icons-react";
+import { IconArrowDown, IconArrowUp, IconArrowsUpDown, IconFilter } from "@tabler/icons-react";
 import useUser from "../utils/queries/user/useUser";
 import getSolvedChallenges from "../utils/queries/challenges/getSolved";
+
+export interface Challenge {
+    id: string;
+    title: string;
+    difficulty: string;
+    category: string;
+    points: number;
+}
 
 function Challenges() {
     const { challenges, loading, error } = useChallenges();
     const { user } = useUser()
     const [sortDirection, setSortDirection] = useState<number[]>([0, 0, 0, 0, 0]);
-    const [sortedChallenges, setSortedChallenges] = useState<any[]>([]);
+    const [sortedChallenges, setSortedChallenges] = useState<Challenge[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [filterDifficulty, setFilterDifficulty] = useState<string[]>([])
     const [filterCategory, setFilterCategory] = useState<string[]>([]);
@@ -32,7 +40,7 @@ function Challenges() {
             setSortedChallenges(filteredChallenges);
             setActivePage(1);
         }, 300);
-    }, [searchTerm]);
+    }, [searchTerm, challenges]);
 
     useEffect(() => {
         if(challenges && challenges.length > 0) {
@@ -68,6 +76,7 @@ function Challenges() {
                     setSolvedChallenges([]);
                 }
             } catch (error) {
+                console.error(error); // just for lint purposes lmao
                 setSolvedChallenges([]);
             }
         };

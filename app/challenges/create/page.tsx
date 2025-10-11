@@ -60,10 +60,11 @@ function CreateChallenge() {
             const data = await createChallenge(values);
             router.push(`/challenges/${data.id}`)
 
-        } catch (error: any) {
-            const errorMessage = typeof error === 'object' && error !== null && 'message' in error 
-                ? error.message 
-                : String(error);
+        } catch (error: unknown) {
+            let errorMessage = 'An unknown error occurred';
+            if (error && typeof error === 'object' && 'message' in error) {
+                errorMessage = String((error as { message?: string }).message);
+            }
                 
             notifications.show({
                 title: 'Error',

@@ -7,6 +7,7 @@ import useUser from "./utils/queries/user/useUser";
 import { Error } from "./components/ui/Error";
 import { IconAward, IconBook, IconBrain, IconRocket, IconShield, IconUserCode } from "@tabler/icons-react";
 import Link from "next/link";
+import Loading from "./components/ui/Loading";
 
 function FeatureCard({ icon, color, title, description }: { icon: React.ReactNode, color: string, title:string, description: string }) {
   return (
@@ -22,6 +23,7 @@ function FeatureCard({ icon, color, title, description }: { icon: React.ReactNod
 
 export default function Home() {
   const { user, loading, error } = useUser();
+  if (loading) return <Loading />;
 
   if (error) return <Error number={500} />;
 
@@ -81,7 +83,7 @@ export default function Home() {
                     </ThemeIcon>
                     <Text fw={600} mb="xs">What is a CTF?</Text>
                     <Text size="sm" c="dimmed">
-                      "Capture The Flag" competitions are cybersecurity contests where 
+                      &quot;Capture The Flag&quot; competitions are cybersecurity contests where 
                       you solve challenges to find hidden flags and earn points.
                     </Text>
                   </Paper>
@@ -171,7 +173,7 @@ export default function Home() {
           <Divider my={80} w={200} />
           <Container style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '2rem', marginBottom: 80 }}>
             <Text style={{ fontSize: 40 }}>
-              We know it's tough, but with NextCTF, we've made it simple and fun!
+              We know it&apos;s tough, but with NextCTF, we&apos;ve made it simple and fun!
             </Text>
             <Image src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/e4a06e09270ddc83e06c3471a97c8701f7466efe_laptop_work.svg" alt="laptop working" width={600} height={400} />
           </Container>
@@ -181,7 +183,7 @@ export default function Home() {
             <Text style={{fontSize: '1.2rem'}}>It would be our pleasure to have you on board! We are still in beta, so if you have any feedback, please let us know! We are always looking for ways to improve our platform and make it better for you.
               <Link color="dark" href="/auth">
                 <Button color="cyan" style={{ marginTop: 20}}>
-                  Sign up now, it's free!
+                  Sign up now, it&apos;s free!
                 </Button>
               </Link>
             </Text>

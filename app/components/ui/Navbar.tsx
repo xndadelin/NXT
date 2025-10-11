@@ -9,7 +9,6 @@ import useUser from "@/app/utils/queries/user/useUser";
 import classes from "@/app/styles/Navbar.module.css";
 import Link from "next/link";
 import Header from "../header/Header";
-import Loading from "./Loading";
 import { Error } from "./Error";
 
 const Navbar: React.FC = () => {

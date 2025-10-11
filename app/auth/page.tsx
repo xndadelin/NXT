@@ -11,6 +11,7 @@ import { Error } from "../components/ui/Error";
 import { useRouter } from "next/navigation";
 import Loading from "../components/ui/Loading";
 import { useEffect } from "react";
+import Image from "next/image";
 const Signin: React.FC = () => {
     const [type, toggle] = useToggle(['login', 'register'])
     const router = useRouter();
@@ -109,13 +110,13 @@ const Signin: React.FC = () => {
                 Welcome to NextCTF, {type} with:
             </Text>
             <Group grow mb="md" mt="md">
-                <Button onClick={() => OAuth("slack_oidc")} leftSection={<img src={SlackIcon} alt="Slack" style={{ width: 18, height: 18 }} />} variant="default" radius="xl" size="md">
+                <Button onClick={() => OAuth("slack_oidc")} leftSection={<Image src={SlackIcon} alt="Slack" style={{ width: 18, height: 18 }} />} variant="default" radius="xl" size="md">
                     Slack
                 </Button>
-                <Button onClick={() => OAuth("discord")} leftSection={<img src={DiscordIcon} alt="Discord" style={{ width: 18, height: 18 }} />} variant="default" radius="xl" size="md">
+                <Button onClick={() => OAuth("discord")} leftSection={<Image src={DiscordIcon} alt="Discord" style={{ width: 18, height: 18 }} />} variant="default" radius="xl" size="md">
                     Discord
                 </Button>
-                <Button onClick={() => OAuth("github")} leftSection={<img src={GitHubIcon} alt="GitHub" style={{ width: 18, height: 18 }} />} variant="default" radius="xl" size="md">
+                <Button onClick={() => OAuth("github")} leftSection={<Image src={GitHubIcon} alt="GitHub" style={{ width: 18, height: 18 }} />} variant="default" radius="xl" size="md">
                     GitHub
                 </Button>
             </Group>    
