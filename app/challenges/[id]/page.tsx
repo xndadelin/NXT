@@ -33,14 +33,16 @@ import { FormEvent, useEffect, useState } from "react";
 import checkIfDone from "@/app/utils/queries/challenges/checkIfDone";
 import { submitFlag } from "@/app/utils/mutations/challenges/submitFlag";
 import { notifications } from "@mantine/notifications";
+import useUser from "@/app/utils/queries/user/useUser";
 
 export default function ChallengePage() {
   const { id } = useParams();
   const challengeId = typeof id === "string" ? id : String(id ?? "");
   const { challenge, loading, error } = useChallenge(challengeId);
   const [done, setDone] = useState<boolean>(false);
+  const { user } = useUser();
 
-  const [flagValue, setFlagValue] = useState<string>('');
+  const [flagValue, setFlagValue] = useState<string>("");
 
   useEffect(() => {
     async function fetchDone() {
@@ -125,32 +127,40 @@ export default function ChallengePage() {
                 </Anchor>
               </Box>
             )}
-            <form
-              onSubmit={onSubmit}
-              style={{
-                display: "flex",
-                marginTop: "20px",
-                alignItems: "center",
-                gap: "10px",
-                justifyContent: "center",
-              }}
-            >
-              <TextInput
-                placeholder={done ? "Challenge completed" : "Flag"}
-                variant="filled"
-                radius="md"
-                size="md"
-                rightSection={<IconFlag size={18} />}
-                style={{ flex: 1 }}
-                disabled={done}
-                value={flagValue}
-                onChange={(e) => setFlagValue(e.target.value)}
-                type="text"
-              />
-              <Button variant="filled" color="green" size="md" disabled={done} type="submit">
-                Submit
-              </Button>
-            </form>
+            {user && (
+              <form
+                onSubmit={onSubmit}
+                style={{
+                  display: "flex",
+                  marginTop: "20px",
+                  alignItems: "center",
+                  gap: "10px",
+                  justifyContent: "center",
+                }}
+              >
+                <TextInput
+                  placeholder={done ? "Challenge completed" : "Flag"}
+                  variant="filled"
+                  radius="md"
+                  size="md"
+                  rightSection={<IconFlag size={18} />}
+                  style={{ flex: 1 }}
+                  disabled={done}
+                  value={flagValue}
+                  onChange={(e) => setFlagValue(e.target.value)}
+                  type="text"
+                />
+                <Button
+                  variant="filled"
+                  color="green"
+                  size="md"
+                  disabled={done}
+                  type="submit"
+                >
+                  Submit
+                </Button>
+              </form>
+            )}
           </Paper>
         </Grid.Col>
 
