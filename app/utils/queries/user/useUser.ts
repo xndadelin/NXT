@@ -30,7 +30,7 @@ export default function useUser() {
                         email: user.email,
                         username: username,
                         provider: user.app_metadata?.provider || 'unknown'
-                    });
+                    }).eq('id', user.id);
                     if (insertError) throw insertError;
                     user.user_metadata = { ...user.user_metadata, username: username, provider: user.app_metadata?.provider || 'unknown' };
                 }
@@ -48,6 +48,7 @@ export default function useUser() {
         const supabase = createClient();
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
+            fetchUser();
         })
 
         return () => {

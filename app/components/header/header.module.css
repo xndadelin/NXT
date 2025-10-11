@@ -5,7 +5,7 @@
     var(--mantine-color-dark-6)
   );
   border-bottom: 1px solid light-dark(var(--mantine-color-gray-2), transparent);
-  margin-bottom: 120px;
+  margin-bottom: 20px;
 }
 
 .inner {

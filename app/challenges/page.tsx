@@ -1,9 +1,12 @@
-import { Container } from "@mantine/core";
+import { Container, Button } from "@mantine/core";
+import Link from "next/link";
 
 function Challenges() {
     return (
-        <Container>
-            Challenges page
+        <Container style={{ display: 'flex' }}>
+            <Button style={{ marginLeft: 'auto' }} component={Link} href={"/challenges/create"} my="md">
+                Create challenge
+            </Button>
         </Container>
     )
 }
