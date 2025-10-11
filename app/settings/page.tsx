@@ -12,7 +12,6 @@ import {
     Group, 
     Divider,
     Avatar,
-    Flex,
     Tooltip
 } from "@mantine/core";
 import useUser from "@/app/utils/queries/user/useUser" 
@@ -21,14 +20,12 @@ import { Error } from "@/app/components/ui/Error";
 import { useState, useEffect } from "react";
 import { useForm } from "@mantine/form";
 import { createClient } from "@/app/utils/supabase/client";
-import { useRouter } from "next/navigation";
 import { notifications } from "@mantine/notifications";
-import { IconUser, IconMail, IconSettings, IconCheck, IconLock } from "@tabler/icons-react";
+import { IconUser, IconMail, IconSettings, IconCheck } from "@tabler/icons-react";
 
 export default function SettingsPage() {
     const { user, loading } = useUser();
     const [username, setUsername] = useState('');
-    const router = useRouter();
     
     const form = useForm({
         initialValues: {
@@ -46,7 +43,7 @@ export default function SettingsPage() {
         if (user && user.email) {
             form.setFieldValue('email', user.email);
         }
-    }, [user])
+    }, [user, form])
 
     if (loading) return <Loading />;
     if (!user) return <Error number={401} />;
@@ -65,7 +62,7 @@ export default function SettingsPage() {
         
         const supabase = createClient();
 
-        const { data, error } = await supabase.from('users').update({
+        const { error } = await supabase.from('users').update({
             username: form.values.username
         }).eq('id', user.id);
 
