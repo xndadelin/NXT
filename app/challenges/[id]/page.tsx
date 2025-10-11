@@ -29,11 +29,26 @@ import {
   IconShield,
   IconTrophy,
 } from "@tabler/icons-react";
+import { FormEvent, useEffect, useState } from "react";
+import checkIfDone from "@/app/utils/queries/challenges/checkIfDone";
+import { submitFlag } from "@/app/utils/mutations/challenges/submitFlag";
+import { notifications } from "@mantine/notifications";
 
 export default function ChallengePage() {
   const { id } = useParams();
   const challengeId = typeof id === "string" ? id : String(id ?? "");
   const { challenge, loading, error } = useChallenge(challengeId);
+  const [done, setDone] = useState<boolean>(false);
+
+  const [flagValue, setFlagValue] = useState<string>('');
+
+  useEffect(() => {
+    async function fetchDone() {
+      const done = await checkIfDone(challengeId);
+      setDone(done);
+    }
+    fetchDone();
+  }, [challengeId]);
 
   if (loading) return <Loading />;
   if (error) return <Error number={500} />;
@@ -44,6 +59,25 @@ export default function ChallengePage() {
     Medium: "yellow",
     Hard: "red",
     Insane: "purple",
+  };
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const isCorrect = await submitFlag(challengeId, flagValue);
+    if (isCorrect) {
+      setDone(true);
+      notifications.show({
+        title: "Success",
+        message: "Correct flag! Challenge completed.",
+        color: "green",
+      });
+    } else {
+      notifications.show({
+        title: "Incorrect",
+        message: "The flag you submitted is incorrect. Please try again.",
+        color: "red",
+      });
+    }
   };
 
   return (
@@ -92,6 +126,7 @@ export default function ChallengePage() {
               </Box>
             )}
             <form
+              onSubmit={onSubmit}
               style={{
                 display: "flex",
                 marginTop: "20px",
@@ -101,14 +136,18 @@ export default function ChallengePage() {
               }}
             >
               <TextInput
-                placeholder="Flag"
+                placeholder={done ? "Challenge completed" : "Flag"}
                 variant="filled"
                 radius="md"
                 size="md"
                 rightSection={<IconFlag size={18} />}
                 style={{ flex: 1 }}
+                disabled={done}
+                value={flagValue}
+                onChange={(e) => setFlagValue(e.target.value)}
+                type="text"
               />
-              <Button variant="filled" color="green" size="md">
+              <Button variant="filled" color="green" size="md" disabled={done} type="submit">
                 Submit
               </Button>
             </form>
