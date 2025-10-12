@@ -29,19 +29,6 @@ function Challenges() {
     const itemsPerPage = 10;
 
     useEffect(() => {
-        setTimeout(() => {
-            const filteredChallenges = challenges.filter((challenge) => {
-                if (searchTerm === '') return true;
-                else {
-                    return challenge.title.toLowerCase().includes(searchTerm.toLowerCase());
-                }
-            });
-            setSortedChallenges(filteredChallenges);
-            setActivePage(1);
-        }, 300);
-    }, [searchTerm, challenges]);
-
-    useEffect(() => {
         if(challenges && challenges.length > 0) {
             const filteredChallenges = challenges.filter((challenge) => {
                 const matchesSearch = searchTerm === '' ||
@@ -59,12 +46,6 @@ function Challenges() {
             setActivePage(1);
         }
     }, [challenges, searchTerm, filterCategory, filterDifficulty])
-
-    useEffect(() => {
-        if (challenges && challenges.length > 0) {
-            setSortedChallenges([...challenges]);
-        }
-    }, [challenges]);
 
     if (loading) return <Loading />;
     if (error) return <Error number={500} />;   
@@ -93,29 +74,27 @@ function Challenges() {
         Insane: 'purple'
     }
     
-    const displayChallenges = (sortedChallenges && sortedChallenges.length > 0) 
-        ? sortedChallenges 
-        : challenges;
+    const displayChallenges = sortedChallenges || []
 
     const paginatedChallenges = displayChallenges.slice((activePage - 1) * itemsPerPage, activePage * itemsPerPage);
 
     const totalPages = Math.max(1, Math.ceil(displayChallenges.length / itemsPerPage));
     
-    const rows = displayChallenges.map((challenge, index) => (
+    const rows = paginatedChallenges.map((challenge, index) => (
         <Table.Tr key={challenge.id} style={{cursor: 'pointer'}} onClick={() => window.location.href = `/challenges/${challenge.id}`}>
-            <Table.Td>{index + 1}</Table.Td>
+            <Table.Td>{(activePage - 1) * itemsPerPage + index + 1}</Table.Td>
             <Table.Td>{challenge.title}</Table.Td>
             <Table.Td>
                 <Badge color={colors[challenge.difficulty as keyof typeof colors] || 'gray'}>{challenge.difficulty}</Badge>
             </Table.Td>
             <Table.Td>{challenge.category}</Table.Td>
             <Table.Td>{challenge.points}</Table.Td>
-            <Table.Td>{solvedChallenges.includes(challenge.id) ? '✅' : '❌'}</Table.Td>
+            <Table.Td>{solvedChallenges?.includes(challenge.id) ? '✅' : '❌'}</Table.Td>
         </Table.Tr>
     ))
 
     const onSort = (column: string, colIndex: number) => {
-        const newSortedChallenges = [...displayChallenges];
+        const newSortedChallenges = [...sortedChallenges];
 
         const newDirection = sortDirection[colIndex] === 0 ? 1 : sortDirection[colIndex] === 1 ? -1 : 1;
 

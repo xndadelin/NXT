@@ -78,8 +78,8 @@ export default function Header() {
             <Container className={classes.inner}>
                 <Group justify="space-between" align="center">
 
-                    <Link style={{ textDecoration: 'none', color: 'inherit', margin: 0, padding: 0 }} href="/" className={classes.logo}>
-                        NXT
+                    <Link style={{ textDecoration: 'none', color: 'inherit', marginLeft: 5 }} href="/" className={classes.logo}>
+                        NextCTF
                     </Link>
 
                     <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
