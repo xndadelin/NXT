@@ -1,11 +1,11 @@
 'use client';
 
-import { Container, Button, Table, Badge, Group, Text, TextInput, Menu, Checkbox, Divider, Pagination } from "@mantine/core";
+import { Container, Button, Table, Badge, Group, Card, Text, TextInput, Menu, Checkbox, Divider, Pagination } from "@mantine/core";
 import Link from "next/link";
 import useChallenges from "../utils/queries/challenges/getChallenges";
 import { Error } from "../components/ui/Error";
 import { useState, useEffect } from "react";
-import { IconArrowDown, IconArrowUp, IconArrowsUpDown, IconFilter } from "@tabler/icons-react";
+import { IconArrowDown, IconArrowUp, IconArrowsUpDown, IconFilter, IconPlus, IconSearch } from "@tabler/icons-react";
 import useUser from "../utils/queries/user/useUser";
 import Loading from "../components/ui/Loading";
 
@@ -170,22 +170,30 @@ function Challenges() {
     }
 
     return (
-        <Container style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <Group justify="apart" mt="md">
-                <TextInput placeholder="Search challenges..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}  style={{ flex: 1, marginRight: '1rem' }} />
-                {user?.user_metadata?.admin && <Button style={{ marginLeft: 'auto' }} component={Link} href={"/challenges/create"} my="md">
-                    Create challenge
-                </Button>}
+        <Container style={{ display: 'flex', flexDirection: 'column' }}>
+            <Card>
+                <Group 
+                    justify="space-between"
+                    p="md"
+                    pb="xs"
+                >
+                    <TextInput 
+                        placeholder="Search challenges..."
+                        value={searchTerm}
+                        onChange={((e) => setSearchTerm(e.target.value))}
+                        style={{ flex: 1, marginRight: '1rem'}}
+                        leftSection={<IconSearch size={"1rem"} />}
+                    />
+                <Group gap="xs">
                 <Menu position="bottom-end" withArrow width={220}>
                     <Menu.Target>
-                        <Button variant="light" rightSection={
+                        <Button variant="light" leftSection={<IconFilter size="0.9rem" />} rightSection={
                             filterDifficulty.length > 0 || filterCategory.length > 0 ? (
                                 <Badge size="xs" variant="filled" color="blue" p={0} w={20} h={20}>
                                     {filterDifficulty.length + filterCategory.length}
                                 </Badge>
                             ) : null
                         }>
-                            <IconFilter size="1rem" />
                             <Text ml={5}>Filter</Text>
                         </Button>
                     </Menu.Target>
@@ -239,39 +247,50 @@ function Challenges() {
 
                     </Menu.Dropdown>
                 </Menu>
+
+                {user?.user_metadata?.admin && (
+                    <Button
+                        leftSection={<IconPlus size="1rem" />}
+                        component={Link}
+                        href={"/challenges/create"}
+                    >
+                        Create challenge
+                    </Button>
+                )}
+
             </Group>
             <Table highlightOnHover withRowBorders my="md">
                 <Table.Thead>
                     <Table.Tr>
-                        <Table.Th>
-                            <Text>Index</Text>
+                        <Table.Th style={{ width: '50px' }}>
+                            #
                         </Table.Th>
-                        <Table.Th style={{ cursor: 'pointer' }} onClick={() => onSort('Title', 1)}>
+                        <Table.Th style={{ cursor: 'pointer', minWidth: '200px' }} onClick={() => onSort('Title', 1)}>
                             <Group gap={5}>
                                 <Text>Title</Text>
                                 {renderSortIcon(1)}
                             </Group>
                         </Table.Th>
-                        <Table.Th style={{ cursor: 'pointer' }} onClick={() => onSort('Difficulty', 2)}>
+                        <Table.Th style={{ cursor: 'pointer', width: '120px' }} onClick={() => onSort('Difficulty', 2)}>
                             <Group gap={5}>
                                 <Text>Difficulty</Text>
                                 {renderSortIcon(2)}
                             </Group>
                         </Table.Th>
-                        <Table.Th style={{ cursor: 'pointer' }} onClick={() => onSort('Category', 3)}>
+                        <Table.Th style={{ cursor: 'pointer', width: '120px' }} onClick={() => onSort('Category', 3)}>
                             <Group gap={5}>
                                 <Text>Category</Text>
                                 {renderSortIcon(3)}
                             </Group>
                         </Table.Th>
-                        <Table.Th style={{ cursor: 'pointer' }} onClick={() => onSort('Points', 4)}>
+                        <Table.Th style={{ cursor: 'pointer', width: '120px' }} onClick={() => onSort('Points', 4)}>
                             <Group gap={5}>
                                 <Text>Points</Text>
                                 {renderSortIcon(4)}
                             </Group>
                         </Table.Th>
-                        <Table.Th>
-                            <Text>Solved</Text>
+                        <Table.Th style={{ width: '100px' }}>
+                            <Text>Status</Text>
                         </Table.Th>
                     </Table.Tr>
                 </Table.Thead>
@@ -279,7 +298,7 @@ function Challenges() {
                     {rows}
                 </Table.Tbody>
             </Table>
-                <Group style={{ width: "100%" }}>
+            <Group style={{ width: "100%" }}>
                 <Text size="sm" c="dimmed">
                     Showing {paginatedChallenges.length} of {displayChallenges.length} challenges
                 </Text>
@@ -293,6 +312,8 @@ function Challenges() {
                     />
                 </div>
             </Group>
+            </Group>
+            </Card>
         </Container>
     )
 }
