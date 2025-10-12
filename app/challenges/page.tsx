@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { IconArrowDown, IconArrowUp, IconArrowsUpDown, IconFilter } from "@tabler/icons-react";
 import useUser from "../utils/queries/user/useUser";
 import getSolvedChallenges from "../utils/queries/challenges/getSolved";
+import Loading from "../components/ui/Loading";
 
 export interface Challenge {
     id: string;
@@ -207,6 +208,9 @@ function Challenges() {
         setFilterDifficulty([]);
         setSearchTerm('');
     }
+
+    if (loading) return <Loading />;
+    if (error) return <Error number={500} />;
 
     return (
         <Container style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>

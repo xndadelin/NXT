@@ -2,11 +2,15 @@
 
 import { Container, Table } from "@mantine/core"
 import { useLeaderboard } from "../utils/queries/leaderboard/getLeaderboard";
+import Loading from "../components/ui/Loading";
+import { Error } from "../components/ui/Error"; 
 
 
 function Leaderboard() {
 
     const { leaderboard, loading, error } = useLeaderboard();
+    if (loading) return <Loading />;
+    if (error) return <Error number={500} />;
 
     const rows = leaderboard.map((user, index) => (
         <Table.Tr key={index}>

@@ -93,6 +93,7 @@ const Signin: React.FC = () => {
                     color: 'green'
                 })
                 router.push('/')
+                window.location.reload()
             } catch (error) {
                 notifications.show({
                     title: 'Error',

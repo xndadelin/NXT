@@ -44,17 +44,6 @@ export default function useUser() {
         }
 
         fetchUser();
-
-        const supabase = createClient();
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
-            fetchUser();
-        })
-
-        return () => {
-            subscription.unsubscribe();
-        }
-
     }, []);
 
 
