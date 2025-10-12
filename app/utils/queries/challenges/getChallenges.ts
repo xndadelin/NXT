@@ -32,7 +32,6 @@ export default function useChallenges() {
                 setChallenges(data || []);
             } catch (err) {
                 setError(err instanceof Error ? err.message : String(err));
-                console.error('Error fetching challenges:', err);
             } finally {
                 setLoading(false);
             }

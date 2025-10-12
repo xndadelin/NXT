@@ -1,23 +1,14 @@
 'use client'
 
 import { Container, Table } from "@mantine/core"
-import { useEffect, useState } from "react";
-import { getLearderboard } from "../utils/queries/leaderboard/getLeaderboard";
+import { useLeaderboard } from "../utils/queries/leaderboard/getLeaderboard";
 
 
 function Leaderboard() {
-    const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
-    useEffect(() => {
-        const fetchLeaderboard = async () => {
-            const data = await getLearderboard();
-            setLeaderboardData(data);
-        };
-        fetchLeaderboard();
-    }, [])
 
-    console.log(leaderboardData);
+    const { leaderboard, loading, error } = useLeaderboard();
 
-    const rows = leaderboardData.map((user, index) => (
+    const rows = leaderboard.map((user, index) => (
         <Table.Tr key={index}>
             <Table.Td>
                 {user.username}

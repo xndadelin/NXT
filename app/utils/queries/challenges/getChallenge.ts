@@ -28,7 +28,7 @@ export default function useChallenges(id: string) {
                     .from('challenges')
                     .select('*')
                     .eq('id', id)
-                    .single();
+                    .maybeSingle();
                 if (error) {
                     throw error;
                 }
@@ -36,7 +36,6 @@ export default function useChallenges(id: string) {
                 setChallenge(data || null);
             } catch (err) {
                 setError(err instanceof Error ? err.message : String(err));
-                console.error('Error fetching challenges:', err);
             } finally {
                 setLoading(false);
             }
