@@ -7,7 +7,6 @@ import { Error } from "../components/ui/Error";
 import { useState, useEffect } from "react";
 import { IconArrowDown, IconArrowUp, IconArrowsUpDown, IconFilter } from "@tabler/icons-react";
 import useUser from "../utils/queries/user/useUser";
-import getSolvedChallenges from "../utils/queries/challenges/getSolved";
 import Loading from "../components/ui/Loading";
 
 export interface Challenge {
