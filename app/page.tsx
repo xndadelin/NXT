@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import { HeroSection } from "./components/ui/HeroSection";
-import { Divider, SimpleGrid, Text, Title, Card, ThemeIcon, Container, Paper, Button } from "@mantine/core";
+import { Divider, SimpleGrid, Text, Title, Card, ThemeIcon, Container, Paper, Button, Box, Group, Badge } from "@mantine/core";
 import useUser from "./utils/queries/user/useUser";
 import { Error } from "./components/ui/Error";
 import { IconAward, IconBook, IconBrain, IconRocket, IconShield, IconUserCode } from "@tabler/icons-react";
 import Link from "next/link";
 import Loading from "./components/ui/Loading";
+import useStats from "./utils/queries/user/useStats";
 
 function FeatureCard({ icon, color, title, description }: { icon: React.ReactNode, color: string, title:string, description: string }) {
   return (
@@ -23,28 +24,23 @@ function FeatureCard({ icon, color, title, description }: { icon: React.ReactNod
 
 export default function Home() {
   const { user, loading, error } = useUser();
+  const { stats, loading: statsLoading, error: statsError } = useStats();
   if (loading) return <Loading />;
 
   if (error) return <Error number={500} />;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "calc(100vh - 300px)",
-      }}
-    >
+    <div>
       {!user ? (
-          <div style={{
+        <div
+          style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             minHeight: "calc(100vh - 300px)",
-          }}>
+          }}
+        >
           <HeroSection />
           <svg
             style={{ marginTop: 140, marginBottom: 40 }}
@@ -60,64 +56,88 @@ export default function Home() {
           </svg>
           <section id="about">
             <Container size="lg" mb={80}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "2rem",
+                }}
+              >
                 <Title order={2} ta="center" fw={800} size={36}>
                   About NextCTF
                 </Title>
-                
-                <Text size="xl" ta="center" style={{ maxWidth: '700px', lineHeight: 1.6 }}>
-                  NextCTF is a cybersecurity training platform where participants 
-                  solve challenges to develop and improve their security skills.
+
+                <Text
+                  size="xl"
+                  ta="center"
+                  style={{ maxWidth: "700px", lineHeight: 1.6 }}
+                >
+                  NextCTF is a cybersecurity training platform where
+                  participants solve challenges to develop and improve their
+                  security skills.
                 </Text>
-                
-                <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xl" style={{ width: '100%' }}>
+
+                <SimpleGrid
+                  cols={{ base: 1, sm: 3 }}
+                  spacing="xl"
+                  style={{ width: "100%" }}
+                >
                   <Paper p="md" radius="md" withBorder>
-                    <ThemeIcon 
-                      size={48} 
-                      radius="md" 
-                      color="blue" 
-                      variant="light" 
+                    <ThemeIcon
+                      size={48}
+                      radius="md"
+                      color="blue"
+                      variant="light"
                       mb="md"
                     >
                       <IconShield size={24} />
                     </ThemeIcon>
-                    <Text fw={600} mb="xs">What is a CTF?</Text>
+                    <Text fw={600} mb="xs">
+                      What is a CTF?
+                    </Text>
                     <Text size="sm" c="dimmed">
-                      &quot;Capture The Flag&quot; competitions are cybersecurity contests where 
-                      you solve challenges to find hidden flags and earn points.
+                      &quot;Capture The Flag&quot; competitions are
+                      cybersecurity contests where you solve challenges to find
+                      hidden flags and earn points.
                     </Text>
                   </Paper>
-                  
+
                   <Paper p="md" radius="md" withBorder>
-                    <ThemeIcon 
-                      size={48} 
-                      radius="md" 
-                      color="grape" 
-                      variant="light" 
+                    <ThemeIcon
+                      size={48}
+                      radius="md"
+                      color="grape"
+                      variant="light"
                       mb="md"
                     >
                       <IconBrain size={24} />
                     </ThemeIcon>
-                    <Text fw={600} mb="xs">Learn by doing</Text>
+                    <Text fw={600} mb="xs">
+                      Learn by doing
+                    </Text>
                     <Text size="sm" c="dimmed">
-                      Practice with web security, cryptography, reverse engineering, 
-                      and forensics challenges designed for all skill levels.
+                      Practice with web security, cryptography, reverse
+                      engineering, and forensics challenges designed for all
+                      skill levels.
                     </Text>
                   </Paper>
-                  
+
                   <Paper p="md" radius="md" withBorder>
-                    <ThemeIcon 
-                      size={48} 
-                      radius="md" 
-                      color="teal" 
-                      variant="light" 
+                    <ThemeIcon
+                      size={48}
+                      radius="md"
+                      color="teal"
+                      variant="light"
                       mb="md"
                     >
                       <IconAward size={24} />
                     </ThemeIcon>
-                    <Text fw={600} mb="xs">Compete</Text>
+                    <Text fw={600} mb="xs">
+                      Compete
+                    </Text>
                     <Text size="sm" c="dimmed">
-                      Join competitions, climb the leaderboard, and track your 
+                      Join competitions, climb the leaderboard, and track your
                       progress as you develop your cybersecurity expertise.
                     </Text>
                   </Paper>
@@ -137,13 +157,13 @@ export default function Home() {
                 title="Various challenges"
                 description="NextCTF offers a wide range of challenges across multiple categories, including   web security, cryptography, reverse engineering, and more."
               />
-              <FeatureCard 
+              <FeatureCard
                 icon={<IconAward size={32} />}
                 color="orange"
                 title="Competitions"
                 description="Participate in regular CTF competitions hosted on the platform to test your skills against others, climb the leaderboard, and win prizes!"
               />
-              <FeatureCard 
+              <FeatureCard
                 icon={<IconBrain size={32} />}
                 color="grape"
                 title="AI-Powered assistant"
@@ -167,19 +187,49 @@ export default function Home() {
                 title="Learning resources"
                 description="Access a variety of learning materials, tutorials, and guides to help you improve your cybersecurity skills."
               />
-
             </SimpleGrid>
           </Container>
           <Divider my={80} w={200} />
-          <Container style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '2rem', marginBottom: 80 }}>
+          <Container
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "2rem",
+              marginBottom: 80,
+            }}
+          >
             <Text style={{ fontSize: 40 }}>
-              We know it&apos;s tough, but with NextCTF, we&apos;ve made it simple and fun!
+              We know it&apos;s tough, but with NextCTF, we&apos;ve made it
+              simple and fun!
             </Text>
-            <Image src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/e4a06e09270ddc83e06c3471a97c8701f7466efe_laptop_work.svg" alt="laptop working" width={600} height={400} />
+            <Image
+              src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/e4a06e09270ddc83e06c3471a97c8701f7466efe_laptop_work.svg"
+              alt="laptop working"
+              width={600}
+              height={400}
+            />
           </Container>
           <Divider my={80} w={200} />
-          <Container style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '2rem', marginBottom: 80, backgroundColor: '#15aabf', color: 'light-dark(var(--mantine-color-dark-0), var(--mantine-color-dark-7))', borderRadius: '16', padding: 40 }}>
-            <Title order={3} style={{ fontSize: '2rem'}}>🤠 So, what are you waiting for? Join us and start today!</Title>
+          <Container
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "2rem",
+              marginBottom: 80,
+              backgroundColor: "#15aabf",
+              color:
+                "light-dark(var(--mantine-color-dark-0), var(--mantine-color-dark-7))",
+              borderRadius: "16",
+              padding: 40,
+            }}
+          >
+            <Title order={3} style={{ fontSize: "2rem" }}>
+              🤠 So, what are you waiting for? Join us and start today!
+            </Title>
             <Text style={{fontSize: '1.2rem'}}>It would be our pleasure to have you on board! We are still in beta, so if you have any feedback, please let us know! We are always looking for ways to improve our platform and make it better for you.
               <Link color="dark" href="/auth">
                 <Button color="cyan" style={{ marginTop: 20}}>
@@ -190,7 +240,69 @@ export default function Home() {
           </Container>
         </div>
       ) : (
-        <div>welcome lmao</div>
+        <Container size="md">
+          <Title order={2}>
+            Welcome back, {user?.user_metadata.full_name || user?.user_metadata.username}! 
+          </Title>
+            <Container p="0" size="md" py="md">
+              <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xl">
+                <Paper p="xl" radius="md" withBorder>
+                  <ThemeIcon size={48} radius="md" color="grape" variant="light" mb="md">
+                    <IconBrain size={24} />
+                  </ThemeIcon>
+                  <Text c="dimmed" fz="sm" fw={500} mb="xs">Solved challenges</Text>
+                  <Group style={{justifyContent: "space-between", alignItems: "center", }}>
+                    <Text fz="2.5rem" fw={700}>
+                      {statsLoading ? "-" : stats?.solvedChallenges || 0}
+                    </Text>
+                    <Button variant="light" color="grape" size="sm" component={Link} href="/challenges">
+                      View all
+                    </Button>
+                  </Group>
+                </Paper>
+
+                <Paper p="xl" radius="md" withBorder>
+                  <ThemeIcon size={48} radius="md" color="blue" variant="light" mb="md">
+                    <IconShield size={24} />
+                  </ThemeIcon>
+                  <Text c="dimmed" fz="sm" fw={500} mb="xs">
+                    Not completed challenges
+                  </Text>
+                  <Group style={{justifyContent: "space-between", alignItems: "center"}}>
+                    <Text fz="2.5rem" fw={700}>
+                      {statsLoading ? "-" : stats?.triedChallenges || 0}
+                    </Text>
+                    <Badge size="lg" color="blue" variant="light">
+                      {statsLoading ? "-" : stats?.solvedChallenges && stats?.triedChallenges ? 
+                        Math.round((stats?.solvedChallenges / (stats?.solvedChallenges + stats?.triedChallenges)) * 100) : 0}%
+                    </Badge>
+                  </Group>
+                </Paper>
+
+                <Paper p="xl" radius="md" withBorder>
+                  <ThemeIcon size={48} radius="md" color="teal" variant="light" mb="md">
+                    <IconAward size={24} />
+                  </ThemeIcon>
+                  <Text c="dimmed" fz="sm" fw={500} mb="xs">Accuracy</Text>
+                  <Group style={{justifyContent: "space-between", alignItems: "center"}}>
+                    <Text fz="2.5rem" fw={700}>
+                      {statsLoading ? "-" : stats?.accuracy || 0}%
+                    </Text>
+                    <Box style={{width: 80, height: 8, backgroundColor: 'var(--mantine-color-gray-2)', borderRadius: 4, overflow: 'hidden'}}>
+                      <Box 
+                        style={{
+                          width: `${statsLoading ? 0 : stats?.accuracy || 0}%`, 
+                          height: '100%', 
+                          backgroundColor: 'var(--mantine-color-teal-6)',
+                          transition: 'width 0.5s ease'
+                        }}
+                      />
+                    </Box>
+                  </Group>
+                </Paper>
+              </SimpleGrid>
+            </Container>
+        </Container>
       )}
     </div>
   );
