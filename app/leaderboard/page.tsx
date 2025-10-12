@@ -1,26 +1,18 @@
 'use client'
 
-import { Badge, Container, Table, Title, Text, Card, Group, Pagination } from "@mantine/core"
+import { Container, Table, Title, Text, Card, Group, Pagination, Box } from "@mantine/core"
 import { useLeaderboard } from "../utils/queries/leaderboard/getLeaderboard";
 import Loading from "../components/ui/Loading";
 import { Error } from "../components/ui/Error"; 
 import { useState } from "react";
 
-
 function Leaderboard() {
-
     const { leaderboard, loading, error } = useLeaderboard();
     const [activePage, setActivePage] = useState<number>(1);
     const usersPerPage = 10;
+    
     if (loading) return <Loading />;
     if (error) return <Error number={500} />;
-
-    const getRankColor = (rank: number) => {
-        if(rank === 0) return 'yellow';
-        if(rank === 1) return 'gray';
-        if(rank === 2) return 'orange';
-        return 'transparent';
-    }
 
     const totalPages = Math.max(1, Math.ceil(leaderboard.length / usersPerPage));
     const currentPage = activePage > totalPages ? totalPages : activePage;
@@ -33,78 +25,89 @@ function Leaderboard() {
     const startIndex = (currentPage - 1) * usersPerPage;
 
     const rows = paginatedUsers.map((user, index) => {
-
       const realRank = startIndex + index;
-
+      const isTopThree = realRank < 3;
+      
       return (
-          <Table.Tr key={user.id}>
-            <Table.Td
-                style={{ width: '60px', textAlign: 'center'}}
+        <Table.Tr key={user.id} style={{ height: "56px" }}>
+          <Table.Td style={{ width: "60px" }}>
+            <Box 
+              style={{ 
+                borderRadius: "50%", 
+                width: "32px", 
+                height: "32px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 600,
+                background: isTopThree ? getRankBackground(realRank) : "transparent",
+                color: isTopThree ? "white" : "inherit",
+                margin: "0 auto"
+              }}
             >
-                <Badge
-                    color={getRankColor(realRank)}
-                    variant={realRank < 3 ? 'filled': 'outline'}
-                    size="md"
-                >
-                    {realRank + 1}
-                </Badge>
-            </Table.Td>
-            <Table.Td>
-                <Text fw={realRank < 3 ? 600 : 400} size="md">
-                    {user.username}
-                </Text>
-            </Table.Td>
-            <Table.Td style={{ textAlign: 'center' }}>
-                <Text size="md" fw={500} c={realRank < 3 ? 'blue' : 'dimmed'}>
-                    {user.points}
-                </Text>
-            </Table.Td>
-            
+              {realRank + 1}
+            </Box>
+          </Table.Td>
+          <Table.Td>
+            <Text fw={isTopThree ? 600 : 400} size="md">
+              {user.username}
+            </Text>
+          </Table.Td>
+          <Table.Td style={{ textAlign: "right", width: "100px" }}>
+            <Text fw={500} size="md" c={isTopThree ? getRankColor(realRank) : "dimmed"}>
+              {user.points}
+            </Text>
+          </Table.Td>
         </Table.Tr>
-      )
+      );
     });
 
+    function getRankColor(rank: number) {
+      if (rank === 0) return "yellow.7";
+      if (rank === 1) return "gray.7";
+      if (rank === 2) return "orange.7";
+      return "blue";
+    }
+    
+    function getRankBackground(rank: number) {
+      if (rank === 0) return "linear-gradient(45deg, #FFD700, #FFC107)";
+      if (rank === 1) return "linear-gradient(45deg, #C0C0C0, #9E9E9E)";
+      if (rank === 2) return "linear-gradient(45deg, #CD7F32, #BF360C)";
+      return "transparent";
+    }
+
     return (
-      <Container size={"md"} py="xl">
-        <Card withBorder shadow="sm" radius={"sm"} p={0}>
-          <Group p="md" pb="xs" justify="space-between" style={{ borderBottom: '1px solid var(--mantine-color-gray-8)'}}>
-            <Title order={2} style={{margin: 0}}>
-                Leaderboard
-            </Title>
-            <Badge size="md" variant="light">
-                Top {leaderboard.length} users
-            </Badge>
-          </Group>
-          <Table withColumnBorders striped horizontalSpacing={"lg"} verticalSpacing={"md"} highlightOnHover>
+      <Container size="md">
+        <Title order={2} mb="md">Leaderboard</Title>
+        
+        <Card withBorder shadow="sm" padding={0}>
+          <Table highlightOnHover verticalSpacing="md">
             <Table.Thead>
               <Table.Tr>
-                <Table.Th style={{ width: "60px", textAlign: "center" }}>
-                  Rank
-                </Table.Th>
+                <Table.Th style={{ width: "60px", textAlign: "center" }}>Rank</Table.Th>
                 <Table.Th>Username</Table.Th>
-                <Table.Th style={{ textAlign: 'center' }}>Points</Table.Th>
+                <Table.Th style={{ textAlign: "right", width: "100px" }}>Points</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{rows}</Table.Tbody>
           </Table>
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0'}}>
-            {totalPages > 1 && (
-              <Group p="md" style={{ borderTop: '1px solid var(--mantine-color-gray-8)' }}>
+          
+          {totalPages > 1 && (
+            <Box py="md" px="lg" style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}>
+              <Group justify="space-between" align="center">
                 <Text size="sm" c="dimmed">
-                  Showing {startIndex + 1}-{startIndex + paginatedUsers.length} of {leaderboard.length} users
+                  Showing {startIndex + 1}-{Math.min(startIndex + usersPerPage, leaderboard.length)} of {leaderboard.length}
                 </Text>
-                <div style={{ marginLeft: 'auto' }}>
-                  <Pagination
-                    total={totalPages}
-                    value={currentPage}
-                    onChange={setActivePage}
-                    withEdges
-                    size={"sm"}
-                  />
-                </div>
+                <Pagination
+                  total={totalPages}
+                  value={currentPage}
+                  onChange={setActivePage}
+                  size="sm"
+                  withEdges
+                />
               </Group>
-            )}
-          </div>
+            </Box>
+          )}
         </Card>
       </Container>
     );
