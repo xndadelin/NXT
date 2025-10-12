@@ -7,7 +7,7 @@ export default async function logout() {
     if (error) {
         throw new Error(error.message);
     }
-    window.location.reload()
+    window.location.href = '/';
 
     return;
 }
