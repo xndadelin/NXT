@@ -16,6 +16,7 @@ export default function useChallenges() {
     const [challenges, setChallenges] = useState<Challenge[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [solvedChallenges, setSolvedChallenges] = useState<string[]>([]);
     
     useEffect(() => {
         async function fetchChallenges() {
@@ -30,6 +31,22 @@ export default function useChallenges() {
                 }
                 
                 setChallenges(data || []);
+                const { data: userData, error: userError } = await supabase.auth.getUser();
+                if (userError) {
+                    throw userError;
+                }
+                if (!userData || !userData.user) {
+                    setSolvedChallenges([]);
+                    return;
+                }
+                const { data: solvedChallenges, error: solvedError } = await supabase.from('submissions').select('challenge').eq('done', true).eq('user_id', userData?.user.id)
+
+                if (solvedError) {
+                    throw solvedError;
+                }
+
+                setSolvedChallenges(solvedChallenges ? solvedChallenges.map(sc => sc.challenge) : [])
+
             } catch (err) {
                 setError(err instanceof Error ? err.message : String(err));
             } finally {
@@ -40,5 +57,5 @@ export default function useChallenges() {
         fetchChallenges();
     }, []);
     
-    return { challenges, loading, error };
+    return { challenges, loading, error, solvedChallenges };
 }

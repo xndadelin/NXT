@@ -19,7 +19,7 @@ export interface Challenge {
 }
 
 function Challenges() {
-    const { challenges, loading, error } = useChallenges();
+    const { challenges, loading, error, solvedChallenges } = useChallenges();
     const { user } = useUser()
     const [sortDirection, setSortDirection] = useState<number[]>([0, 0, 0, 0, 0]);
     const [sortedChallenges, setSortedChallenges] = useState<Challenge[]>([]);
@@ -27,7 +27,6 @@ function Challenges() {
     const [filterDifficulty, setFilterDifficulty] = useState<string[]>([])
     const [filterCategory, setFilterCategory] = useState<string[]>([]);
     const [activePage, setActivePage] = useState(1);
-    const [solvedChallenges, setSolvedChallenges] = useState<string[]>([]);
     const itemsPerPage = 10;
 
     useEffect(() => {
@@ -67,25 +66,8 @@ function Challenges() {
             setSortedChallenges([...challenges]);
         }
     }, [challenges]);
-    useEffect(() => {
-        const fetchSolvedChallenges = async () => {
-            try {
-                if (user?.id) {
-                    const challs = await getSolvedChallenges(user.id);
-                    setSolvedChallenges(challs);
-                } else {
-                    setSolvedChallenges([]);
-                }
-            } catch (error) {
-                console.error(error); // just for lint purposes lmao
-                setSolvedChallenges([]);
-            }
-        };
-        
-        fetchSolvedChallenges();
-    }, [user])
 
-    if (loading) return null;
+    if (loading) return <Loading />;
     if (error) return <Error number={500} />;   
     if (!challenges) return <Error number={505} />;
 
@@ -208,9 +190,6 @@ function Challenges() {
         setFilterDifficulty([]);
         setSearchTerm('');
     }
-
-    if (loading) return <Loading />;
-    if (error) return <Error number={500} />;
 
     return (
         <Container style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
