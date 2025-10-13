@@ -21,7 +21,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "@mantine/form";
 import { createClient } from "@/app/utils/supabase/client";
 import { notifications } from "@mantine/notifications";
-import { IconUser, IconMail, IconSettings, IconCheck } from "@tabler/icons-react";
+import { IconUser, IconMail, IconSettings, IconCheck, IconLock, IconKey } from "@tabler/icons-react";
 
 export default function SettingsPage() {
     const { user, loading } = useUser();
@@ -127,6 +127,30 @@ export default function SettingsPage() {
             icon: <IconCheck size={16} />,
         });
     }
+
+    const onChangePassword = async () => {
+        const supabase = createClient();
+        const { error } = await supabase.auth.resetPasswordForEmail(user.email!, {
+            redirectTo: `${window.location.origin}/auth/update-password`
+        });
+
+        if (error) {
+            notifications.show({
+                title: 'Error',
+                message: error.message,
+                color: 'red'
+            })
+            return;
+        }
+
+        notifications.show({
+            title: 'Success',
+            message: 'Password reset email sent. Pls check your inbox (and spam folder).',
+            color: 'green',
+            icon: <IconCheck size={16} />,
+        })
+
+    }
     
     return (
         <Container py="xl">
@@ -219,6 +243,28 @@ export default function SettingsPage() {
                             </Stack>
                         </form>
                     </Card>
+
+                    <Card withBorder shadow="sm" radius="md" padding="xl">
+                        <Card.Section withBorder inheritPadding py="xs" mb="md">
+                            <Group>
+                                <IconLock size={20} stroke={1.5} />
+                                <Text fw={500}>Security</Text>
+                            </Group>
+                        </Card.Section>
+
+                        <Stack gap="md" style={{ display: 'flex', flexDirection: 'row' }} >
+                            <Text size="sm">
+                                You can reset your password by sending a password reset email link to your registered email address.
+                            </Text>
+                            <Tooltip label="Reset password">
+                                <Button variant="light" style={{ width: '30%' }} color="cyan" onClick={onChangePassword} rightSection={<IconKey size={14} />} ml="auto">
+                                    Reset password
+                                </Button>
+                            </Tooltip>
+                        </Stack>
+
+                    </Card>
+
                 </Stack>
             </Paper>
         </Container>
