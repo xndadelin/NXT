@@ -2,9 +2,8 @@
 
 import { createClient } from "@/app/utils/supabase/client";
 import { useEffect, useState } from "react";
-import { Error } from "@/app/components/ui/Error";
 import { useRouter } from "next/navigation";
-import { Container, Paper, TextInput, Button, Title, Text, PasswordInput, Group } from "@mantine/core";
+import { Container, Paper, Button, Title, Text, PasswordInput, Group } from "@mantine/core";
 
 export default function UpdatePasswordPage() {
     const supabase = createClient();
@@ -40,15 +39,15 @@ export default function UpdatePasswordPage() {
             setLoading(true);
             setError(null);
 
-            const { data, error: updateError } = await supabase.auth.updateUser({
+            const { error: updateError } = await supabase.auth.updateUser({
                 password: newPassword
             });
 
             if (updateError) throw updateError;
 
             alert('great! password updated succesfully');
-        } catch (error : any) {
-            setError(error.message || 'failed to update password.')
+        } catch (error) {
+            setError(String(error));
         } finally {
             setLoading(false);
         }
