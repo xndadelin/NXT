@@ -58,10 +58,22 @@ function FeatureCard({
   );
 }
 
+const difficultyColors: { [key: string]: string } ={
+  Easy: 'green',
+  Medium: 'yellow',
+  Hard: 'red',
+  Insane: 'purple'
+}
+
+
 export default function Home() {
   const { user, loading, error } = useUser();
   const { stats, loading: statsLoading } = useStats();
-  const { lastTriedChallenge, error: lastTriedChallengeError, loading: loadingLastTriedChallenge } = getLastTriedChallenge();
+  const {
+    lastTriedChallenge,
+    error: lastTriedChallengeError,
+    loading: loadingLastTriedChallenge,
+  } = getLastTriedChallenge();
   console.log(lastTriedChallenge, lastTriedChallengeError);
   if (loading) return <Loading />;
 
@@ -289,7 +301,10 @@ export default function Home() {
           </Title>
           <Container p="0" size="md" py="md">
             <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xl">
-              <Paper p="xl" radius="md" withBorder>
+              <Paper p="xl" radius="md" withBorder style={{ 
+                display: 'flex',
+                flexDirection: 'column'
+               }}>
                 <ThemeIcon
                   size={48}
                   radius="md"
@@ -306,6 +321,7 @@ export default function Home() {
                   style={{
                     justifyContent: "space-between",
                     alignItems: "center",
+                    marginTop: 'auto'
                   }}
                 >
                   <Text fz="2.5rem" fw={700}>
@@ -323,7 +339,10 @@ export default function Home() {
                 </Group>
               </Paper>
 
-              <Paper p="xl" radius="md" withBorder>
+              <Paper p="xl" radius="md" withBorder style={{
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
                 <ThemeIcon
                   size={48}
                   radius="md"
@@ -340,6 +359,7 @@ export default function Home() {
                   style={{
                     justifyContent: "space-between",
                     alignItems: "center",
+                    marginTop: 'auto'
                   }}
                 >
                   <Text fz="2.5rem" fw={700}>
@@ -383,7 +403,7 @@ export default function Home() {
                   <Text fz="2.5rem" fw={700}>
                     {statsLoading ? "-" : stats?.accuracy || 0}%
                   </Text>
-                  <Box
+                  {/*<Box
                     style={{
                       width: 80,
                       height: 8,
@@ -400,22 +420,49 @@ export default function Home() {
                         transition: "width 0.5s ease",
                       }}
                     />
-                  </Box>
+                  </Box>*/}
                 </Group>
               </Paper>
             </SimpleGrid>
           </Container>
           {lastTriedChallenge && (
-            <Paper withBorder p="xl" radius="md" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Group mb="sm">
-                <ThemeIcon size={32} radius="md" color="blue" variant="light">
-                  <IconRocket size={18} />
-                </ThemeIcon>
-                <Text fw={600} size="lg">Continue where you left off: {<Link style={{ color: 'white', cursor: 'pointer' }} href={`/challenge/${lastTriedChallenge.id}`}>{lastTriedChallenge.title}</Link>}</Text>
+            <Paper withBorder p="xl" radius="md" mb="xl">
+              <Group justify="space-between" align="center">
+                <Group align="flex-start">
+                  <ThemeIcon size={48} radius="md" color="gray" variant="light">
+                    <IconRocket size={24} />
+                  </ThemeIcon>
+                  <Box>
+                    <Text c="dimmed" size="sm" fw={500} mb={4}>
+                      Continue where you left off
+                    </Text>
+                    <Text fw={700} size="xl" mb={12}>
+                      {lastTriedChallenge.title}
+                    </Text>
+                    <Group gap={8}>
+                      <Badge
+                        color={difficultyColors[lastTriedChallenge.difficulty] || 'gray'}
+                        size="md"
+                        variant="filled"
+                      >
+                        {lastTriedChallenge.difficulty}
+                      </Badge>
+                      <Badge color="gray" size="md" variant="light">
+                        {lastTriedChallenge.category}
+                      </Badge>
+                    </Group>
+                  </Box>
+                </Group>
+
+                <Button
+                  component={Link}
+                  href={`/challenges/${lastTriedChallenge.id}`}
+                  rightSection={<IconArrowRight size={18} />}
+                  variant="filled"
+                >
+                  Continue challenge
+                </Button>
               </Group>
-              <Button component={Link} href={`/challenges/${lastTriedChallenge.id}`} rightSection={<IconArrowRight size={16} />}>
-                Continue challenge
-              </Button>
             </Paper>
           )}
 
@@ -425,10 +472,12 @@ export default function Home() {
                 <ThemeIcon size={32} radius={"md"} variant="light">
                   <IconRocket size={18} />
                 </ThemeIcon>
-                <Text fw={600} size="lg">Ready to start?</Text>
+                <Text fw={600} size="lg">
+                  Ready to start?
+                </Text>
               </Group>
               <Text c="dimmed" mb="md">
-                You haven&apos;t started any challenges yet. Explore challenges!
+                You do not have any ongoing challenges. Browse our collection and start!
               </Text>
 
               <Button
@@ -437,12 +486,10 @@ export default function Home() {
                 variant="light"
                 rightSection={<IconArrowRight size={16} />}
               >
-                Browse challenges             
+                Browse challenges
               </Button>
-
             </Paper>
           )}
-
         </Container>
       )}
     </div>
