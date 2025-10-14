@@ -32,6 +32,7 @@ export async function submitFlag(challengeId: string, flag: string) {
         .update({
           done: true,
           tries: tries,
+          updated_at: new Date(),
         })
         .eq("user_id", id)
         .eq("challenge", challengeId);
@@ -44,6 +45,7 @@ export async function submitFlag(challengeId: string, flag: string) {
         .from("submissions")
         .update({
           tries: tries,
+          updated_at: new Date(),
         })
         .eq("user_id", id)
         .eq("challenge", challengeId);
@@ -59,6 +61,7 @@ export async function submitFlag(challengeId: string, flag: string) {
         challenge: challengeId,
         done: true,
         tries: 1,
+        updated_at: new Date(),
       });
 
       if (insertError) {
@@ -70,6 +73,7 @@ export async function submitFlag(challengeId: string, flag: string) {
         challenge: challengeId,
         done: false,
         tries: 1,
+        updated_at: new Date(),
       });
 
       if (insertError) {

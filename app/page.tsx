@@ -19,6 +19,7 @@ import {
 import useUser from "./utils/queries/user/useUser";
 import { Error } from "./components/ui/Error";
 import {
+  IconArrowRight,
   IconAward,
   IconBook,
   IconBrain,
@@ -29,6 +30,7 @@ import {
 import Link from "next/link";
 import Loading from "./components/ui/Loading";
 import useStats from "./utils/queries/user/useStats";
+import { getLastTriedChallenge } from "./utils/queries/challenges/getLastTriedChallenge";
 
 function FeatureCard({
   icon,
@@ -59,6 +61,8 @@ function FeatureCard({
 export default function Home() {
   const { user, loading, error } = useUser();
   const { stats, loading: statsLoading } = useStats();
+  const { lastTriedChallenge, error: lastTriedChallengeError, loading: loadingLastTriedChallenge } = getLastTriedChallenge();
+  console.log(lastTriedChallenge, lastTriedChallengeError);
   if (loading) return <Loading />;
 
   if (error) return <Error number={500} />;
@@ -401,6 +405,44 @@ export default function Home() {
               </Paper>
             </SimpleGrid>
           </Container>
+          {lastTriedChallenge && (
+            <Paper withBorder p="xl" radius="md" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Group mb="sm">
+                <ThemeIcon size={32} radius="md" color="blue" variant="light">
+                  <IconRocket size={18} />
+                </ThemeIcon>
+                <Text fw={600} size="lg">Continue where you left off: {<Link style={{ color: 'white', cursor: 'pointer' }} href={`/challenge/${lastTriedChallenge.id}`}>{lastTriedChallenge.title}</Link>}</Text>
+              </Group>
+              <Button component={Link} href={`/challenges/${lastTriedChallenge.id}`} rightSection={<IconArrowRight size={16} />}>
+                Continue challenge
+              </Button>
+            </Paper>
+          )}
+
+          {!lastTriedChallenge && !loadingLastTriedChallenge && (
+            <Paper withBorder p="xl" radius="md" mb={"xl"}>
+              <Group mb="lg">
+                <ThemeIcon size={32} radius={"md"} variant="light">
+                  <IconRocket size={18} />
+                </ThemeIcon>
+                <Text fw={600} size="lg">Ready to start?</Text>
+              </Group>
+              <Text c="dimmed" mb="md">
+                You haven&apos;t started any challenges yet. Explore challenges!
+              </Text>
+
+              <Button
+                component={Link}
+                href={"/challenges"}
+                variant="light"
+                rightSection={<IconArrowRight size={16} />}
+              >
+                Browse challenges             
+              </Button>
+
+            </Paper>
+          )}
+
         </Container>
       )}
     </div>
