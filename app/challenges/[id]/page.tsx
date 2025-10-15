@@ -21,6 +21,7 @@ import { useParams } from "next/navigation";
 import useChallenge from "@/app/utils/queries/challenges/getChallenge";
 import Loading from "@/app/components/ui/Loading";
 import { Error } from "@/app/components/ui/Error";
+import DOMPurify from "dompurify";
 import {
   IconCalendar,
   IconCategory,
@@ -104,9 +105,9 @@ export default function ChallengePage() {
             <Divider mb="md" />
 
             <Box mt="md">
-              <Text size="md" lh={1.6} style={{ whiteSpace: "pre-wrap" }}>
-                {challenge.description}
-              </Text>
+              <Text size="md" lh={1.6} style={{ whiteSpace: "pre-wrap" }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(challenge.description, {
+                USE_PROFILES: { html: true, svg: true }
+              }) }} />
             </Box>
 
             {challenge.resource && (

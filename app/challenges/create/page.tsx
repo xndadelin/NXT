@@ -1,6 +1,6 @@
 'use client';
 
-import { Container, Title, TextInput, Select, NumberInput, Checkbox, Button } from "@mantine/core";
+import { Container, Title, TextInput, Select, NumberInput, Checkbox, Button, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import useUser from "@/app/utils/queries/user/useUser";
 import { Error } from "@/app/components/ui/Error";
@@ -77,7 +77,7 @@ function CreateChallenge() {
     
 
     return (
-        <Container>
+        <Container my="xl">
             <Title order={2} my="md">Create challenge</Title>
             <form onSubmit={async (e) => {
                 e.preventDefault();
@@ -91,13 +91,15 @@ function CreateChallenge() {
                     value={form.values.title}
                     onChange={(e) => form.setFieldValue('title', e.currentTarget.value)}
                 />
-                <TextInput
+                <Textarea
                     label="Description"
                     placeholder="Challenge description"
                     required
                     size="md"
                     value={form.values.description}
                     onChange={(e) => form.setFieldValue('description', e.currentTarget.value)}
+                    rows={10}
+                    mt="md"
                 />
                 <Select
                     label="Difficulty"
