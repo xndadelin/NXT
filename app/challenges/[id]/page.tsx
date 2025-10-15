@@ -45,6 +45,7 @@ import { notifications } from "@mantine/notifications";
 import useUser from "@/app/utils/queries/user/useUser";
 import { useRouter } from "next/navigation";
 import deleteChallenge from "@/app/utils/queries/challenges/deleteChallenge";
+import Discussion from "@/app/components/challenge/discussion/Discussion";
 
 export default function ChallengePage() {
   const { id } = useParams();
@@ -223,6 +224,7 @@ export default function ChallengePage() {
               </form>
             )}
           </Paper>
+          <Discussion challengeId={challengeId} />
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 4 }}>
