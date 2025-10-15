@@ -24,6 +24,7 @@ import useChallenge from "@/app/utils/queries/challenges/getChallenge";
 import Loading from "@/app/components/ui/Loading";
 import { Error } from "@/app/components/ui/Error";
 import DOMPurify from "dompurify";
+import Link from "next/link";
 import {
   IconCalendar,
   IconCategory,
@@ -263,7 +264,9 @@ export default function ChallengePage() {
                 >
                   <Group align="center" gap={5}>
                     <Text fw={500}>MITRE ATT&CK:</Text>
-                    <Text>{challenge.mitre}</Text>
+                    <Link target="_blank" style={{ color: 'white'}} href={challenge.mitre}>
+                      {challenge.mitre.split('/')[4]}
+                    </Link>
                   </Group>
                 </List.Item>
               )}
