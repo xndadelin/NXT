@@ -30,7 +30,7 @@ import {
 import Link from "next/link";
 import Loading from "./components/ui/Loading";
 import useStats from "./utils/queries/user/useStats";
-import { getLastTriedChallenge } from "./utils/queries/challenges/getLastTriedChallenge";
+import { useGetLastTriedChallenge } from "./utils/queries/challenges/getLastTriedChallenge";
 
 function FeatureCard({
   icon,
@@ -73,7 +73,7 @@ export default function Home() {
     lastTriedChallenge,
     error: lastTriedChallengeError,
     loading: loadingLastTriedChallenge,
-  } = getLastTriedChallenge();
+  } = useGetLastTriedChallenge();
   console.log(lastTriedChallenge, lastTriedChallengeError);
   if (loading) return <Loading />;
 

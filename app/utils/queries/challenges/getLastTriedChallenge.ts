@@ -9,7 +9,7 @@ interface lastTriedChallenge {
     difficulty: string
 }
 
-export function getLastTriedChallenge() {
+export function useGetLastTriedChallenge() {
     const supabase = createClient();
     const [error, setError] = useState<Error>()
     const [lastTriedChallenge, setLastTriedChallenge] = useState<lastTriedChallenge | null>(null)
