@@ -40,6 +40,7 @@ import { submitFlag } from "@/app/utils/mutations/challenges/submitFlag";
 import { notifications } from "@mantine/notifications";
 import useUser from "@/app/utils/queries/user/useUser";
 import { useRouter } from "next/navigation";
+import deleteChallenge from "@/app/utils/queries/challenges/deleteChallenge";
 
 export default function ChallengePage() {
   const { id } = useParams();
@@ -89,6 +90,22 @@ export default function ChallengePage() {
     }
   };
 
+  const onDelete = () => {
+    if (confirm("Are you ABSOLUTELY SURE YOU WANT TO DELETE THIS CHALLENGE? THIS ACTION CANNOT BE UNDONE IN ANY WAY!") && user?.user_metadata?.admin){
+      try {
+        deleteChallenge(challengeId);
+        router.push('/challenges')
+      } catch (error) {
+        notifications.show({
+          title: 'Error',
+          message: 'There was an error deleting the challenge.' + error,
+          color: 'red'
+        })
+      }
+
+    }
+  }
+
   return (
     <Container size="xl" py="xl">
       <Grid gutter="xl">
@@ -127,6 +144,7 @@ export default function ChallengePage() {
                     </Menu.Item>
                     <Menu.Item
                       leftSection={<IconTrash size={14} />}
+                      onClick={() => onDelete()}
                     >
                       Delete challenge
                     </Menu.Item>
