@@ -16,6 +16,8 @@ import {
   Anchor,
   TextInput,
   Button,
+  Menu,
+  ActionIcon
 } from "@mantine/core";
 import { useParams } from "next/navigation";
 import useChallenge from "@/app/utils/queries/challenges/getChallenge";
@@ -25,9 +27,11 @@ import DOMPurify from "dompurify";
 import {
   IconCalendar,
   IconCategory,
+  IconDots,
   IconExternalLink,
   IconFlag,
   IconShield,
+  IconTrash,
   IconTrophy,
 } from "@tabler/icons-react";
 import { FormEvent, useEffect, useState } from "react";
@@ -35,6 +39,7 @@ import checkIfDone from "@/app/utils/queries/challenges/checkIfDone";
 import { submitFlag } from "@/app/utils/mutations/challenges/submitFlag";
 import { notifications } from "@mantine/notifications";
 import useUser from "@/app/utils/queries/user/useUser";
+import { useRouter } from "next/navigation";
 
 export default function ChallengePage() {
   const { id } = useParams();
@@ -42,6 +47,7 @@ export default function ChallengePage() {
   const { challenge, loading, error } = useChallenge(challengeId);
   const [done, setDone] = useState<boolean>(false);
   const { user } = useUser();
+  const router = useRouter();
 
   const [flagValue, setFlagValue] = useState<string>("");
 
@@ -88,18 +94,50 @@ export default function ChallengePage() {
       <Grid gutter="xl">
         <Grid.Col span={{ base: 12, md: 8 }}>
           <Paper shadow="sm" p="lg" radius="md" withBorder mb="lg">
-            <Group mb="xs" justify="space-between">
-              <Title order={2} fw={700}>
-                {challenge.title}
-              </Title>
-              <Badge
-                size="lg"
-                radius="md"
-                color={difficultyColors[challenge.difficulty] || "gray"}
-                variant="filled"
-              >
-                {challenge.difficulty}
-              </Badge>
+            <Group justify="space-between" align="flex-start" mb="lg">
+              <Group align="center">
+                <Title order={2} fw={700}>
+                  {challenge.title}
+                </Title>
+                <Badge
+                  size="lg"
+                  radius="md"
+                  color={difficultyColors[challenge.difficulty] || "gray"}
+                  variant="filled"
+                >
+                  {challenge.difficulty}
+                </Badge>
+              </Group>
+
+              {user?.user_metadata?.admin && (
+                <Menu shadow="md" width={200} position="bottom-end">
+                  <Menu.Target>
+                    <ActionIcon variant="subtle" color="gray" size={"lg"} radius={"md"}>
+                      <IconDots size={18} />
+                    </ActionIcon>
+                  </Menu.Target>
+
+                  <Menu.Dropdown>
+                    <Menu.Label>Admin actions</Menu.Label>
+                    <Menu.Item
+                      leftSection={<IconCategory size={14} />}
+                      onClick={() => router.push(`/challenges/${challengeId}/edit`)}
+                    >
+                      Edit challenge
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={<IconTrash size={14} />}
+                    >
+                      Delete challenge
+                    </Menu.Item>
+                  </Menu.Dropdown>
+
+                </Menu>
+
+                  
+
+              )}
+
             </Group>
 
             <Divider mb="md" />
