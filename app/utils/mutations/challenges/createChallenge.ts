@@ -10,12 +10,17 @@ interface Challenge {
     resource?: string;
     mitre?: string;
     case_insensitive?: boolean;
+    id?: string;
 }
 
 
 export default async function createChallenge(challenge: Challenge) {
     const supabase = await createClient();
-    const { data, error } = await supabase.from('challenges').insert([challenge]).select().single();
+
+    const { data, error } = await supabase.from('challenges').upsert(
+        [challenge],
+        { onConflict: 'id' }
+    ).select().single();
 
     if (error) {
         throw new Error(error.message);

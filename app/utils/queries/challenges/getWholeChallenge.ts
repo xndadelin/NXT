@@ -13,9 +13,11 @@ export interface Challenge {
     description: string;
     resource: string;
     mitre: string;
+    flag: string;
+    case_insensitive: boolean;
 }
 
-export default function useChallenges(id: string) {
+export default function useGetWholeChallenge(id: string) {
     const [challenge, setChallenge] = useState<Challenge | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export default function useChallenges(id: string) {
                 const supabase = createClient();
                 const { data, error } = await supabase
                     .from('challenges')
-                    .select('id, title, difficulty, category, points, created_at, description, resource, mitre')
+                    .select('*')
                     .eq('id', id)
                     .maybeSingle();
                 if (error) {
