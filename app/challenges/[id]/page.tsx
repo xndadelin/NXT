@@ -53,8 +53,8 @@ export default function ChallengePage() {
   const [done, setDone] = useState<boolean>(false);
   const { user } = useUser();
   const router = useRouter();
-
   const [flagValue, setFlagValue] = useState<string>("");
+  const [pressedHints, setPressedHints] = useState<boolean>(false)
 
   useEffect(() => {
     async function fetchDone() {
@@ -304,9 +304,15 @@ export default function ChallengePage() {
               leftSection={
                 <IconBulb size={14} />
               }
+              onClick={() => setPressedHints(!pressedHints)}
             >
               View hints
             </Button>
+            {pressedHints && (
+              <Text size="sm" c="dimmed" mb='md'>
+                {!challenge?.hints ? 'No hints available for this challenge.' : challenge?.hints}
+              </Text>
+            )}
             <Button
               variant="light"
               fullWidth

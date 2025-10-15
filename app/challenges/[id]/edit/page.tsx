@@ -18,7 +18,19 @@ function EditChallenge() {
     const challengeId = Array.isArray(id) ? id[0] : id || '';
     const { challenge, loading: challengeLoading, error: challengeError } = useGetWholeChallenge(challengeId);
 
-    const form = useForm({
+    const form = useForm<{
+        title: string;
+        description: string;
+        difficulty: string;
+        category: string;
+        flag: string;
+        resource: string;
+        points: number;
+        mitre: string;
+        case_insensitive: boolean;
+        hints: string;
+        id: string;
+    }>({
         initialValues: {
             title: challenge?.title || '',
             description: challenge?.description || '',
@@ -30,6 +42,7 @@ function EditChallenge() {
             mitre: challenge?.mitre || '',
             case_insensitive: challenge?.case_insensitive || false,
             id: challenge?.id || '',
+            hints: challenge?.hints || ''
         },
 
         validate: {
@@ -174,6 +187,14 @@ function EditChallenge() {
                     value={form.values.points}
                     onChange={(e) => form.setFieldValue('points', Number(e) || 500)}
                     mt={"md"}
+                />
+                <TextInput
+                    label="Hints"
+                    placeholder="Challenge hints (separate by commas)"
+                    size="md"
+                    value={form.values.hints}
+                    onChange={(e) => form.setFieldValue('hints', e.currentTarget.value)}
+                    mt="md"
                 />
                 <Checkbox
                     label="Case insensitive flag"

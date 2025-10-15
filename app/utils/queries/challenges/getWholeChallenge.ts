@@ -15,6 +15,7 @@ export interface Challenge {
     mitre: string;
     flag: string;
     case_insensitive: boolean;
+    hints: string;
 }
 
 export default function useGetWholeChallenge(id: string) {

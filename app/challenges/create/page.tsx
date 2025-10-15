@@ -13,7 +13,18 @@ function CreateChallenge() {
     const { user, loading, error } = useUser();
     const router = useRouter();
 
-    const form = useForm({
+    const form = useForm<{
+        title: string;
+        description: string;
+        difficulty: string;
+        category: string;
+        flag: string;
+        resource: string;
+        points: number;
+        mitre: string;
+        case_insensitive: boolean;
+        hints: string
+    }>({
         initialValues: {
             title: '',
             description: '',
@@ -24,6 +35,7 @@ function CreateChallenge() {
             points: 0,
             mitre: '',
             case_insensitive: false,
+            hints: ''
         },
 
         validate: {
@@ -153,6 +165,14 @@ function CreateChallenge() {
                     value={form.values.points}
                     onChange={(e) => form.setFieldValue('points', Number(e) || 500)}
                     mt={"md"}
+                />
+                <Textarea
+                    label="Hints"
+                    placeholder="Challenge hints (separate by commas)"
+                    size="md"
+                    value={form.values.hints}
+                    onChange={(e) => { form.setFieldValue('hints', e.currentTarget.value) }}
+                    mt="md"
                 />
                 <Checkbox
                     label="Case insensitive flag"

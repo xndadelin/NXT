@@ -11,8 +11,8 @@ interface Challenge {
     mitre?: string;
     case_insensitive?: boolean;
     id?: string;
+    hints?: string
 }
-
 
 export default async function createChallenge(challenge: Challenge) {
     const supabase = await createClient();
