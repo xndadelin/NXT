@@ -1,3 +1,4 @@
+import { notifications } from "@mantine/notifications";
 import { createClient } from "../../supabase/client";
 import checkFlag from "@/app/utils/queries/challenges/checkFlag";
 

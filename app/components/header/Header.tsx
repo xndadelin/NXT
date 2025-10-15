@@ -26,7 +26,7 @@ export default function Header() {
         const path = pathname === "/" ? "Home" : pathname.split("/")[1];
         const formattedPath = path.charAt(0).toUpperCase() + path.slice(1);
 
-        const validTabs = ["Home", "Challenges", "Leaderboard", "Learn", "Community"];
+        const validTabs = ["Home", "Challenges", "Leaderboard", "Learn", "Writeups"];
         if (validTabs.includes(formattedPath)) {
             setActiveTab(formattedPath);
         } else {
@@ -42,7 +42,7 @@ export default function Header() {
         image: user_data?.user_metadata?.avatar_url || null,
     }
 
-    const tabs = ["Home", "Challenges", "Leaderboard", "Learn", "Community"].map((tab) => (
+    const tabs = ["Home", "Challenges", "Leaderboard", "Learn", "Writeups"].map((tab) => (
         <Tabs.Tab value={tab} key={tab}>
             {tab}
         </Tabs.Tab>

@@ -26,11 +26,14 @@ import { Error } from "@/app/components/ui/Error";
 import DOMPurify from "dompurify";
 import Link from "next/link";
 import {
+  IconBook,
+  IconBulb,
   IconCalendar,
   IconCategory,
   IconDots,
   IconExternalLink,
   IconFlag,
+  IconMessageCircle,
   IconShield,
   IconTrash,
   IconTrophy,
@@ -286,6 +289,44 @@ export default function ChallengePage() {
                 </Group>
               </List.Item>
             </List>
+          </Card>
+          <Card shadow="sm" p="lg" radius={"md"} withBorder>
+            <Title order={4} mb="md" fw={600}>
+              Need help?
+            </Title>
+            <Text size="sm" c="dimmed" mb='md'>
+              Stuck on this challenge?
+            </Text>
+            <Button
+              variant="light"
+              fullWidth
+              mb="xs"
+              leftSection={
+                <IconBulb size={14} />
+              }
+            >
+              View hints
+            </Button>
+            <Button
+              variant="light"
+              fullWidth
+              leftSection={
+                <IconMessageCircle size={14} />
+              }
+              mb="xs"
+            >
+              Discussion
+            </Button>
+            <Button
+              variant="light"
+              fullWidth
+              mb="xs"
+              leftSection={
+                <IconBook size={14} />
+              }
+            >
+              Writeups
+            </Button>
           </Card>
         </Grid.Col>
       </Grid>
