@@ -314,8 +314,10 @@ export default function ChallengePage() {
                 <IconMessageCircle size={14} />
               }
               mb="xs"
+              component={Link}
+              href={"/challenges"}
             >
-              Discussion
+              Try another challenge
             </Button>
             <Button
               variant="light"
