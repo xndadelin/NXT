@@ -18,6 +18,8 @@ import { FormEvent, useState } from "react";
 import { Text } from "@mantine/core";
 import MDEditor from "@uiw/react-md-editor";
 import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 interface HeaderItem {
     id: string;
@@ -48,8 +50,50 @@ export default function AddTopicPage() {
     },
   });
 
-  const onHandleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onHandleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if(!form.values.title || !form.values.shortDescription || !form.values.content) {
+        notifications.show({
+            title: 'Error',
+            message: 'Please fill in all required fields.',
+            color: 'red'
+        })
+        return;
+    }
+    try {
+        const result = generateFinalContent(parseMarkdown(form.values.content, quizQuestions), quizQuestions);
+        setFinalContent(JSON.stringify(result, null, 2));
+
+        const supabase = createClientComponentClient();
+        const { data, error } = await supabase.rpc('insert_topic', {
+            p_title: form.values.title,
+            p_short_description: form.values.shortDescription,
+            p_author_id: user?.id || '',
+            p_content: result,
+        })
+
+        if(error) {
+            notifications.show({
+                title: 'Error',
+                message: error?.message,
+                color: 'red'
+            })
+            return ;
+        }
+
+        notifications.show({
+            title: 'Success',
+            message: 'topic created!',
+            color: 'green'
+        })
+    } catch(error) {
+        notifications.show({
+            title: 'Error',
+            message: 'an unexpected error occurred',
+            color: 'red'
+        })
+    }
   }
 
   const parseMarkdown = (markdown: string, quizQuestions: { question: string, answer: string}[]) => {
@@ -181,8 +225,6 @@ export default function AddTopicPage() {
     return result;
   }
 
-  console.log(generateFinalContent(parseMarkdown(form.values.content, quizQuestions), quizQuestions));
-
   if (loading) return <Loading />;
   if (error) return <Error number={500} />;
   if (!user || !user.user_metadata?.admin) return <Error number={401} />;
@@ -278,6 +320,9 @@ export default function AddTopicPage() {
             No quiz questions added yet. You can add some by clicking that button.
         </Text>
       )}
+      <Button variant="light" color="green" my="md" onClick={(e) => onHandleSubmit(e as any)}>
+        Create topic
+      </Button>
     </Container>
   );
 }

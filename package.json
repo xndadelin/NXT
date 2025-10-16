@@ -13,6 +13,7 @@
     "@mantine/form": "^8.3.4",
     "@mantine/hooks": "^8.3.3",
     "@mantine/notifications": "^8.3.4",
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.75.0",
     "@tabler/icons-react": "^3.35.0",
