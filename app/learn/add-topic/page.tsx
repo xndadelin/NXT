@@ -21,15 +21,27 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-interface HeaderItem {
+interface ParsedHeader {
     id: string;
+    level: number;
     title: string;
     parentId: string | null;
+    content: string[];
+    quizIds: number[];
+    children?: ParsedHeader[];
+}
+
+interface TopicNode {
+    title: string;
+    level: number;
+    content: string;
+    quizzes: { question: string; answer: string }[];
+    children: TopicNode[];
 }
 
 export default function AddTopicPage() {
   const { user, loading, error } = useUser();
-  const [headers, setHeaders] = useState<HeaderItem[]>([]);
+  const [headers, setHeaders] = useState<ParsedHeader[]>([]);
   const [quizQuestions, setQuizQuestions] = useState<{ question: string, answer: string }[]>([]);
   const [subHeaders, setSubHeaders] = useState<string[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
@@ -66,7 +78,7 @@ export default function AddTopicPage() {
         setFinalContent(JSON.stringify(result, null, 2));
 
         const supabase = createClientComponentClient();
-        const { data, error } = await supabase.rpc('insert_topic', {
+        const { error } = await supabase.rpc('insert_topic', {
             p_title: form.values.title,
             p_short_description: form.values.shortDescription,
             p_author_id: user?.id || '',
@@ -108,7 +120,14 @@ export default function AddTopicPage() {
         quizIds: number[]
     }[] = [];
 
-    let currentHeader: any = null;
+    let currentHeader: {
+        id: string;
+        level: number;
+        title: string;
+        parentId: string | null;
+        content: string[];
+        quizIds: number[];
+    } | null = null;
     let contentBuffer: string[] = [];
 
     lines.forEach((line) => {
@@ -116,7 +135,7 @@ export default function AddTopicPage() {
 
         if (headerMatch) {
             if (currentHeader) {
-                const headerIndex = structure.findIndex(h => h.id === currentHeader.id);
+                const headerIndex = structure.findIndex(h => h.id === currentHeader?.id);
                 if (headerIndex !== -1) {
                     let start = 0;
                     let end = contentBuffer.length - 1;
@@ -157,7 +176,7 @@ export default function AddTopicPage() {
             if(quizMatch && currentHeader) {
                 const quizIndex = parseInt(quizMatch[1], 10) - 1;
                 if(quizIndex >= 0 && quizIndex < quizQuestions.length) {
-                    currentHeader.quizIds.push(quizIndex);
+                    currentHeader?.quizIds.push(quizIndex);
                 }
             }
         } else { 
@@ -166,7 +185,7 @@ export default function AddTopicPage() {
     });
 
     if (currentHeader) {
-        const headerIndex = structure.findIndex((h) => h.id === currentHeader.id);
+        const headerIndex = structure.findIndex((h) => h.id === currentHeader?.id);
         if (headerIndex !== -1) {
             let start = 0;
             let end = contentBuffer.length - 1;
@@ -181,17 +200,17 @@ export default function AddTopicPage() {
     return structure;
 }
 
-  const generateFinalContent = (structure: any[], quizQuestions: { question: string, answer: string }[]) => {
+  const generateFinalContent = (structure: ParsedHeader[], quizQuestions: { question: string, answer: string }[]) => {
     const headerTree = structure.filter(header => !header.parentId)
 
-    const addChildren = (parent: any) => {
+    const addChildren = (parent: ParsedHeader) : ParsedHeader => {
         parent.children = structure.filter(header => header.parentId === parent.id);
         parent.children.forEach(addChildren)
         return parent;
     }
 
     const tree = headerTree.map(addChildren)
-    const result = [] as TopicNode[];
+    const result: TopicNode[] = [];
 
     type TopicNode = {
         title: string;
@@ -201,7 +220,7 @@ export default function AddTopicPage() {
         children: TopicNode[];
     };
 
-    const processNode = (node: any, depth = 0): TopicNode => {
+    const processNode = (node: ParsedHeader, depth = 0): TopicNode => {
         const item: TopicNode = {
             title: node.title,
             level: node.level,
@@ -211,7 +230,7 @@ export default function AddTopicPage() {
         };
 
         if(node.children && node.children.length > 0) {
-            node.children.forEach((child: any) => {
+            node.children.forEach((child: ParsedHeader) => {
                 item.children.push(processNode(child, depth + 1));
             });
         }
@@ -320,9 +339,11 @@ export default function AddTopicPage() {
             No quiz questions added yet. You can add some by clicking that button.
         </Text>
       )}
-      <Button variant="light" color="green" my="md" onClick={(e) => onHandleSubmit(e as any)}>
-        Create topic
-      </Button>
-    </Container>
+      <form onSubmit={onHandleSubmit}>
+        <Button type="submit" my="md" >
+            Create topic
+        </Button>
+     </form>
+     </Container>
   );
 }
