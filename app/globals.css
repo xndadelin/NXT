@@ -1,3 +1,11 @@
 html {
   scroll-behavior: smooth;
 }
+
+.wmde-markdown {
+  background-color: transparent !important
+}
+
+.w-md-editor-toolbar {
+  background-color: var(--mantine-color-dark-8) !important;
+}
