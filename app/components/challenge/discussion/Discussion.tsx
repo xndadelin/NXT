@@ -1,7 +1,7 @@
 import { useDiscussion } from "@/app/utils/queries/challenges/discussion/getDiscussion";
 import { Error } from "../../ui/Error";
 import { Card, Text, Group, Title, Badge, Stack, Paper, Avatar, Box, Textarea, Button, Divider } from "@mantine/core";
-import { IconClock, IconMessage, IconPlus, IconSend } from "@tabler/icons-react";
+import { IconClock, IconCornerDownRight, IconMessage, IconPlus, IconSend } from "@tabler/icons-react";
 import useUser from "@/app/utils/queries/user/useUser"
 import { notifications } from "@mantine/notifications";
 import { useState } from "react";
@@ -28,6 +28,8 @@ export default function Discussion({ challengeId }: DiscussionProps) {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [showCommentForm, setShowCommentForm] = useState<boolean>(false);
     const [respondTo, setRespondTo] = useState<string | null>(null);
+    const [replyText, setReplyText] = useState<string>('')
+    const [isReplying, setIsReplaying] = useState<boolean>(false);
 
     const handleSubmitComment = async() => {
         if(!newMessage.trim() || !user) return;
@@ -53,6 +55,59 @@ export default function Discussion({ challengeId }: DiscussionProps) {
             setIsSubmitting(false);
         }
     }
+
+    const handleSubmitReply = async(parentId: string) => {
+        if(!replyText.trim() || !user?.id) return;
+        setIsReplaying(true);
+        try {   
+            await addComment(challengeId, user.id, replyText.trim(), parentId);
+            setReplyText('');
+            setRespondTo(null);
+            notifications.show({
+                title: 'Success',
+                message: 'your reply has been posted! yey',
+                color: 'greeen'
+            })
+        } catch (error) {
+            notifications.show({
+                title: 'Error',
+                message: 'failed to add reply',
+                color: 'red'
+            })
+        } finally {
+            setIsReplaying(false)
+        }
+    }
+
+    const CommentComponent = ({ comment, isReply = false }: { comment: Discussion, isReply?: boolean}) => (
+        <Box>
+            <Group gap="sm" align="flex-start">
+                {isReply && (
+                    <IconCornerDownRight size={16} color="var(--mantine-color-gray-5)" />
+                )}
+            </Group>
+        </Box>
+    )
+
+    const organizeComments = (comments: Discussion[]) => {
+        const topLevel: Discussion[] = [];
+        const replies: { [key: string]: Discussion[] } = {}
+
+        comments.forEach(comment => {
+            if(!comment.respond_to) {
+                topLevel.push(comment);
+            } else {
+                if(!replies[comment.respond_to]) {
+                    replies[comment.respond_to] = []
+                }
+                replies[comment.respond_to].push(comment);
+            }
+        })
+        return { topLevel, replies }
+    }
+
+
+    const { topLevel, replies } = discussion ? organizeComments(discussion) : { topLevel: [], replies: {} }
 
     if (loading) return (
         <Card withBorder p="lg" radius={"md"}>

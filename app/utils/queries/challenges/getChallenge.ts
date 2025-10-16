@@ -13,7 +13,7 @@ export interface Challenge {
     description: string;
     resource: string;
     mitre: string;
-    hints: string[]
+    hints: string;
 }
 
 export default function useChallenges(id: string) {
