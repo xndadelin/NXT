@@ -1,11 +1,7 @@
-import { Container } from "@mantine/core"
+import { Container } from "@mantine/core";
 
 function Community() {
-    return (
-        <Container>
-            Community page
-        </Container>
-    )
+  return <Container>Community page</Container>;
 }
 
 export default Community;

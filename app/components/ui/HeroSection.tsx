@@ -37,23 +37,24 @@ const HeroSection: React.FC = () => {
 
       <div className={classes.inner}>
         <Title className={classes.title}>
-            A platform for {' '}
-            <Text component="span" className={classes.highlight} inherit>Capture The Flag</Text>{" "}
-            challenges & competitions!
+          A platform for{" "}
+          <Text component="span" className={classes.highlight} inherit>
+            Capture The Flag
+          </Text>{" "}
+          challenges & competitions!
         </Title>
       </div>
 
       <div className={classes.controls}>
-        <Link href="/auth" style={{ textDecoration: 'none', marginRight: 20 }}>
+        <Link href="/auth" style={{ textDecoration: "none", marginRight: 20 }}>
           <Button className={classes.control} size="xl" color="cyan">
-              Get started!
+            Get started!
           </Button>
         </Link>
         <Button className={classes.control} size="xl" color="red">
-            Learn more
+          Learn more
         </Button>
       </div>
-
     </Container>
   );
 };

@@ -1,49 +1,51 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import { createClient } from "../../supabase/client";
 
 export interface Challenge {
-    id: string;
-    title: string;
-    difficulty: string;
-    category: string;
-    points: number;
-    created_at: string;
-    description: string;
-    resource: string;
-    mitre: string;
-    hints: string;
+  id: string;
+  title: string;
+  difficulty: string;
+  category: string;
+  points: number;
+  created_at: string;
+  description: string;
+  resource: string;
+  mitre: string;
+  hints: string;
 }
 
 export default function useChallenges(id: string) {
-    const [challenge, setChallenge] = useState<Challenge | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    
-    useEffect(() => {
-        async function fetchChallenge() {
-            try {
-                const supabase = createClient();
-                const { data, error } = await supabase
-                    .from('challenges')
-                    .select('id, title, difficulty, category, points, created_at, description, resource, mitre, hints')
-                    .eq('id', id)
-                    .maybeSingle();
-                if (error) {
-                    throw error;
-                }
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-                setChallenge(data || null);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : String(err));
-            } finally {
-                setLoading(false);
-            }
+  useEffect(() => {
+    async function fetchChallenge() {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("challenges")
+          .select(
+            "id, title, difficulty, category, points, created_at, description, resource, mitre, hints"
+          )
+          .eq("id", id)
+          .maybeSingle();
+        if (error) {
+          throw error;
         }
 
-        fetchChallenge();
-    }, [id]);
+        setChallenge(data || null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+      } finally {
+        setLoading(false);
+      }
+    }
 
-    return { challenge, loading, error };
+    fetchChallenge();
+  }, [id]);
+
+  return { challenge, loading, error };
 }

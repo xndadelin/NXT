@@ -1,6 +1,15 @@
-'use client';
+"use client";
 
-import { Container, Title, TextInput, Select, NumberInput, Checkbox, Button, Textarea } from "@mantine/core";
+import {
+  Container,
+  Title,
+  TextInput,
+  Select,
+  NumberInput,
+  Checkbox,
+  Button,
+  Textarea,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import useUser from "@/app/utils/queries/user/useUser";
 import { Error } from "@/app/components/ui/Error";
@@ -12,202 +21,223 @@ import useGetWholeChallenge from "@/app/utils/queries/challenges/getWholeChallen
 import { useEffect } from "react";
 
 function EditChallenge() {
-    const { user, loading, error } = useUser();
-    const router = useRouter();
-    const { id } = useParams();
-    const challengeId = Array.isArray(id) ? id[0] : id || '';
-    const { challenge, loading: challengeLoading, error: challengeError } = useGetWholeChallenge(challengeId);
+  const { user, loading, error } = useUser();
+  const router = useRouter();
+  const { id } = useParams();
+  const challengeId = Array.isArray(id) ? id[0] : id || "";
+  const {
+    challenge,
+    loading: challengeLoading,
+    error: challengeError,
+  } = useGetWholeChallenge(challengeId);
 
-    const form = useForm<{
-        title: string;
-        description: string;
-        difficulty: string;
-        category: string;
-        flag: string;
-        resource: string;
-        points: number;
-        mitre: string;
-        case_insensitive: boolean;
-        hints: string;
-        id: string;
-    }>({
-        initialValues: {
-            title: challenge?.title || '',
-            description: challenge?.description || '',
-            difficulty: challenge?.difficulty || '',
-            category: challenge?.category || '',
-            flag: challenge?.flag || '',
-            resource: challenge?.resource || '',
-            points: challenge?.points || 0,
-            mitre: challenge?.mitre || '',
-            case_insensitive: challenge?.case_insensitive || false,
-            id: challenge?.id || '',
-            hints: challenge?.hints || ''
-        },
+  const form = useForm<{
+    title: string;
+    description: string;
+    difficulty: string;
+    category: string;
+    flag: string;
+    resource: string;
+    points: number;
+    mitre: string;
+    case_insensitive: boolean;
+    hints: string;
+    id: string;
+  }>({
+    initialValues: {
+      title: challenge?.title || "",
+      description: challenge?.description || "",
+      difficulty: challenge?.difficulty || "",
+      category: challenge?.category || "",
+      flag: challenge?.flag || "",
+      resource: challenge?.resource || "",
+      points: challenge?.points || 0,
+      mitre: challenge?.mitre || "",
+      case_insensitive: challenge?.case_insensitive || false,
+      id: challenge?.id || "",
+      hints: challenge?.hints || "",
+    },
 
-        validate: {
-            title: (value) => (!value ? 'Title is required' : null),
-            description: (value) => (!value ? 'Description is required' : null),
-            difficulty: (value) => (!value ? 'Difficulty is required': null),
-            category: (value) => (!value ? 'Category is required' : null),
-            flag: (value) => (!value ? 'Flag is required' : null),
-            points: (value) => (value <= 0 ? 'Points must be greater than 0' : null),
-        }
-    })
+    validate: {
+      title: (value) => (!value ? "Title is required" : null),
+      description: (value) => (!value ? "Description is required" : null),
+      difficulty: (value) => (!value ? "Difficulty is required" : null),
+      category: (value) => (!value ? "Category is required" : null),
+      flag: (value) => (!value ? "Flag is required" : null),
+      points: (value) => (value <= 0 ? "Points must be greater than 0" : null),
+    },
+  });
 
-    useEffect(() => {
-        form.setValues({
-            title: challenge?.title || '',
-            description: challenge?.description || '',
-            difficulty: challenge?.difficulty || '',
-            category: challenge?.category || '',
-            flag: challenge?.flag || '',
-            resource: challenge?.resource || '',
-            points: challenge?.points || 0,
-            mitre: challenge?.mitre || '',
-            case_insensitive: challenge?.case_insensitive || false,
-            id: challenge?.id || '',
-        })
-    }, [challenge])
+  useEffect(() => {
+    form.setValues({
+      title: challenge?.title || "",
+      description: challenge?.description || "",
+      difficulty: challenge?.difficulty || "",
+      category: challenge?.category || "",
+      flag: challenge?.flag || "",
+      resource: challenge?.resource || "",
+      points: challenge?.points || 0,
+      mitre: challenge?.mitre || "",
+      case_insensitive: challenge?.case_insensitive || false,
+      id: challenge?.id || "",
+    });
+  }, [challenge]);
 
-    const difficultyOptions = ['Easy', 'Medium', 'Hard', 'Insane'];
-    const categoryOptions = ['Web', 'Crypto', 'Forensics', 'Pwn', 'Misc', 'Reversing', 'Stego', 'AI'];
+  const difficultyOptions = ["Easy", "Medium", "Hard", "Insane"];
+  const categoryOptions = [
+    "Web",
+    "Crypto",
+    "Forensics",
+    "Pwn",
+    "Misc",
+    "Reversing",
+    "Stego",
+    "AI",
+  ];
 
-    if (loading || challengeLoading) return null;
-    if (error || challengeError) return <Error number={500} />;
-    if (!user) return <Loading />;
-    if (!user?.user_metadata?.admin) return <Loading />;
+  if (loading || challengeLoading) return null;
+  if (error || challengeError) return <Error number={500} />;
+  if (!user) return <Loading />;
+  if (!user?.user_metadata?.admin) return <Loading />;
 
-    const onSubmit = async(values: typeof form.values) => {
-        const hasErrors = form.validate().hasErrors;
-        
-        if (hasErrors) {
-            notifications.show({
-                title: 'Error',
-                message: error as string || 'Please fix the errors in the form',
-                color: 'red'
-            })
-            return ;
-        }
+  const onSubmit = async (values: typeof form.values) => {
+    const hasErrors = form.validate().hasErrors;
 
-        try {
-            const data = await createChallenge(values);
-            router.push(`/challenges/${data.id}`)
-
-        } catch (error: unknown) {
-            let errorMessage = 'An unknown error occurred';
-            if (error && typeof error === 'object' && 'message' in error) {
-                errorMessage = String((error as { message?: string }).message);
-            }
-                
-            notifications.show({
-                title: 'Error',
-                message: errorMessage,
-                color: 'red'
-            })
-        }
-
+    if (hasErrors) {
+      notifications.show({
+        title: "Error",
+        message: (error as string) || "Please fix the errors in the form",
+        color: "red",
+      });
+      return;
     }
-    
 
-    return (
-        <Container my="xl">
-            <Title order={2} my="md">Edit challenge</Title>
-            <form onSubmit={async (e) => {
-                e.preventDefault();
-                await onSubmit(form.values);
-            }}>
-                <TextInput
-                    label="Title"
-                    placeholder="Challenge title"
-                    required
-                    size="md"
-                    value={form.values.title}
-                    onChange={(e) => form.setFieldValue('title', e.currentTarget.value)}
-                />
-                <Textarea
-                    label="Description"
-                    placeholder="Challenge description"
-                    required
-                    size="md"
-                    value={form.values.description}
-                    onChange={(e) => form.setFieldValue('description', e.currentTarget.value)}
-                    rows={10}
-                    mt="md"
-                />
-                <Select
-                    label="Difficulty"
-                    placeholder="Select difficulty"
-                    required
-                    size="md"
-                    value={form.values.difficulty}
-                    onChange={(e) => form.setFieldValue('difficulty', e || '')}
-                    data={difficultyOptions}
-                    mt="md"
-                />
-                <Select
-                    label="Category"
-                    placeholder="Select category"
-                    required
-                    size="md"
-                    value={form.values.category}
-                    onChange={(e) => form.setFieldValue('category', e || '')}
-                    data={categoryOptions}
-                    mt={"md"}
-                />
-                <TextInput
-                    label="Flag"
-                    placeholder="Challenge flag"
-                    required
-                    size="md"
-                    value={form.values.flag}
-                    onChange={(e) => form.setFieldValue('flag', e.currentTarget.value)}
-                    mt={"md"}
-                />
-                <TextInput
-                    label="Resource"
-                    placeholder="Resource link"
-                    size="md"
-                    value={form.values.resource}
-                    onChange={(e) => form.setFieldValue('resource', e.currentTarget.value)}
-                    mt="md"
-                />
-                <TextInput
-                    label="MITRE ATT&CK"
-                    placeholder="MITRE ATT&CK link"
-                    size="md"
-                    value={form.values.mitre}
-                    onChange={(e) => form.setFieldValue('mitre', e.currentTarget.value)}
-                    mt="md"
-                />
-                <NumberInput
-                    label="Points"
-                    placeholder="Challenge points"
-                    size="md"
-                    value={form.values.points}
-                    onChange={(e) => form.setFieldValue('points', Number(e) || 500)}
-                    mt={"md"}
-                />
-                <TextInput
-                    label="Hints"
-                    placeholder="Challenge hints (separate by commas)"
-                    size="md"
-                    value={form.values.hints}
-                    onChange={(e) => form.setFieldValue('hints', e.currentTarget.value)}
-                    mt="md"
-                />
-                <Checkbox
-                    label="Case insensitive flag"
-                    size="md"
-                    checked={form.values.case_insensitive}
-                    onChange={(e) => form.setFieldValue('case_insensitive', e.currentTarget.checked)}
-                    mt="md"
-                />
-                <Button type="submit" mt="md" style={{ marginLeft: 'auto' }} >Edit challenge</Button>
+    try {
+      const data = await createChallenge(values);
+      router.push(`/challenges/${data.id}`);
+    } catch (error: unknown) {
+      let errorMessage = "An unknown error occurred";
+      if (error && typeof error === "object" && "message" in error) {
+        errorMessage = String((error as { message?: string }).message);
+      }
 
-            </form>
-        </Container>
-    )
+      notifications.show({
+        title: "Error",
+        message: errorMessage,
+        color: "red",
+      });
+    }
+  };
+
+  return (
+    <Container my="xl">
+      <Title order={2} my="md">
+        Edit challenge
+      </Title>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          await onSubmit(form.values);
+        }}
+      >
+        <TextInput
+          label="Title"
+          placeholder="Challenge title"
+          required
+          size="md"
+          value={form.values.title}
+          onChange={(e) => form.setFieldValue("title", e.currentTarget.value)}
+        />
+        <Textarea
+          label="Description"
+          placeholder="Challenge description"
+          required
+          size="md"
+          value={form.values.description}
+          onChange={(e) =>
+            form.setFieldValue("description", e.currentTarget.value)
+          }
+          rows={10}
+          mt="md"
+        />
+        <Select
+          label="Difficulty"
+          placeholder="Select difficulty"
+          required
+          size="md"
+          value={form.values.difficulty}
+          onChange={(e) => form.setFieldValue("difficulty", e || "")}
+          data={difficultyOptions}
+          mt="md"
+        />
+        <Select
+          label="Category"
+          placeholder="Select category"
+          required
+          size="md"
+          value={form.values.category}
+          onChange={(e) => form.setFieldValue("category", e || "")}
+          data={categoryOptions}
+          mt={"md"}
+        />
+        <TextInput
+          label="Flag"
+          placeholder="Challenge flag"
+          required
+          size="md"
+          value={form.values.flag}
+          onChange={(e) => form.setFieldValue("flag", e.currentTarget.value)}
+          mt={"md"}
+        />
+        <TextInput
+          label="Resource"
+          placeholder="Resource link"
+          size="md"
+          value={form.values.resource}
+          onChange={(e) =>
+            form.setFieldValue("resource", e.currentTarget.value)
+          }
+          mt="md"
+        />
+        <TextInput
+          label="MITRE ATT&CK"
+          placeholder="MITRE ATT&CK link"
+          size="md"
+          value={form.values.mitre}
+          onChange={(e) => form.setFieldValue("mitre", e.currentTarget.value)}
+          mt="md"
+        />
+        <NumberInput
+          label="Points"
+          placeholder="Challenge points"
+          size="md"
+          value={form.values.points}
+          onChange={(e) => form.setFieldValue("points", Number(e) || 500)}
+          mt={"md"}
+        />
+        <TextInput
+          label="Hints"
+          placeholder="Challenge hints (separate by commas)"
+          size="md"
+          value={form.values.hints}
+          onChange={(e) => form.setFieldValue("hints", e.currentTarget.value)}
+          mt="md"
+        />
+        <Checkbox
+          label="Case insensitive flag"
+          size="md"
+          checked={form.values.case_insensitive}
+          onChange={(e) =>
+            form.setFieldValue("case_insensitive", e.currentTarget.checked)
+          }
+          mt="md"
+        />
+        <Button type="submit" mt="md" style={{ marginLeft: "auto" }}>
+          Edit challenge
+        </Button>
+      </form>
+    </Container>
+  );
 }
 
 export default EditChallenge;

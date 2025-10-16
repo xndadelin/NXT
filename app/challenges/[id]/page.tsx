@@ -17,7 +17,7 @@ import {
   TextInput,
   Button,
   Menu,
-  ActionIcon
+  ActionIcon,
 } from "@mantine/core";
 import { useParams } from "next/navigation";
 import useChallenge from "@/app/utils/queries/challenges/getChallenge";
@@ -55,7 +55,7 @@ export default function ChallengePage() {
   const { user } = useUser();
   const router = useRouter();
   const [flagValue, setFlagValue] = useState<string>("");
-  const [pressedHints, setPressedHints] = useState<boolean>(false)
+  const [pressedHints, setPressedHints] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchDone() {
@@ -96,20 +96,24 @@ export default function ChallengePage() {
   };
 
   const onDelete = () => {
-    if (confirm("Are you ABSOLUTELY SURE YOU WANT TO DELETE THIS CHALLENGE? THIS ACTION CANNOT BE UNDONE IN ANY WAY!") && user?.user_metadata?.admin){
+    if (
+      confirm(
+        "Are you ABSOLUTELY SURE YOU WANT TO DELETE THIS CHALLENGE? THIS ACTION CANNOT BE UNDONE IN ANY WAY!"
+      ) &&
+      user?.user_metadata?.admin
+    ) {
       try {
         deleteChallenge(challengeId);
-        router.push('/challenges')
+        router.push("/challenges");
       } catch (error) {
         notifications.show({
-          title: 'Error',
-          message: 'There was an error deleting the challenge.' + error,
-          color: 'red'
-        })
+          title: "Error",
+          message: "There was an error deleting the challenge." + error,
+          color: "red",
+        });
       }
-
     }
-  }
+  };
 
   return (
     <Container size="xl" py="xl">
@@ -134,7 +138,12 @@ export default function ChallengePage() {
               {user?.user_metadata?.admin && (
                 <Menu shadow="md" width={200} position="bottom-end">
                   <Menu.Target>
-                    <ActionIcon variant="subtle" color="gray" size={"lg"} radius={"md"}>
+                    <ActionIcon
+                      variant="subtle"
+                      color="gray"
+                      size={"lg"}
+                      radius={"md"}
+                    >
                       <IconDots size={18} />
                     </ActionIcon>
                   </Menu.Target>
@@ -143,7 +152,9 @@ export default function ChallengePage() {
                     <Menu.Label>Admin actions</Menu.Label>
                     <Menu.Item
                       leftSection={<IconCategory size={14} />}
-                      onClick={() => router.push(`/challenges/${challengeId}/edit`)}
+                      onClick={() =>
+                        router.push(`/challenges/${challengeId}/edit`)
+                      }
                     >
                       Edit challenge
                     </Menu.Item>
@@ -154,21 +165,23 @@ export default function ChallengePage() {
                       Delete challenge
                     </Menu.Item>
                   </Menu.Dropdown>
-
                 </Menu>
-
-                  
-
               )}
-
             </Group>
 
             <Divider mb="md" />
 
             <Box mt="md">
-              <Text size="md" lh={1.6} style={{ whiteSpace: "pre-wrap" }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(challenge.description, {
-                USE_PROFILES: { html: true, svg: true }
-              }) }} />
+              <Text
+                size="md"
+                lh={1.6}
+                style={{ whiteSpace: "pre-wrap" }}
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(challenge.description, {
+                    USE_PROFILES: { html: true, svg: true },
+                  }),
+                }}
+              />
             </Box>
 
             {challenge.resource && (
@@ -269,8 +282,12 @@ export default function ChallengePage() {
                 >
                   <Group align="center" gap={5}>
                     <Text fw={500}>MITRE ATT&CK:</Text>
-                    <Link target="_blank" style={{ color: 'white'}} href={challenge.mitre}>
-                      {challenge.mitre.split('/')[4]}
+                    <Link
+                      target="_blank"
+                      style={{ color: "white" }}
+                      href={challenge.mitre}
+                    >
+                      {challenge.mitre.split("/")[4]}
                     </Link>
                   </Group>
                 </List.Item>
@@ -296,31 +313,29 @@ export default function ChallengePage() {
             <Title order={4} mb="md" fw={600}>
               Need help?
             </Title>
-            <Text size="sm" c="dimmed" mb='md'>
+            <Text size="sm" c="dimmed" mb="md">
               Stuck on this challenge?
             </Text>
             <Button
               variant="light"
               fullWidth
               mb="xs"
-              leftSection={
-                <IconBulb size={14} />
-              }
+              leftSection={<IconBulb size={14} />}
               onClick={() => setPressedHints(!pressedHints)}
             >
               View hints
             </Button>
             {pressedHints && (
-              <Text size="sm" c="dimmed" mb='md'>
-                {!challenge?.hints ? 'No hints available for this challenge.' : challenge?.hints}
+              <Text size="sm" c="dimmed" mb="md">
+                {!challenge?.hints
+                  ? "No hints available for this challenge."
+                  : challenge?.hints}
               </Text>
             )}
             <Button
               variant="light"
               fullWidth
-              leftSection={
-                <IconMessageCircle size={14} />
-              }
+              leftSection={<IconMessageCircle size={14} />}
               mb="xs"
               component={Link}
               href={"/challenges"}
@@ -331,9 +346,7 @@ export default function ChallengePage() {
               variant="light"
               fullWidth
               mb="xs"
-              leftSection={
-                <IconBook size={14} />
-              }
+              leftSection={<IconBook size={14} />}
             >
               Writeups
             </Button>

@@ -1,11 +1,7 @@
-import { Container } from "@mantine/core"
+import { Container } from "@mantine/core";
 
 function Learn() {
-    return (
-        <Container>
-            Learn page
-        </Container>
-    )
+  return <Container>Learn page</Container>;
 }
 
 export default Learn;

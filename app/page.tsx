@@ -58,13 +58,12 @@ function FeatureCard({
   );
 }
 
-const difficultyColors: { [key: string]: string } ={
-  Easy: 'green',
-  Medium: 'yellow',
-  Hard: 'red',
-  Insane: 'purple'
-}
-
+const difficultyColors: { [key: string]: string } = {
+  Easy: "green",
+  Medium: "yellow",
+  Hard: "red",
+  Insane: "purple",
+};
 
 export default function Home() {
   const { user, loading, error } = useUser();
@@ -301,10 +300,15 @@ export default function Home() {
           </Title>
           <Container p="0" size="md" py="md">
             <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xl">
-              <Paper p="xl" radius="md" withBorder style={{ 
-                display: 'flex',
-                flexDirection: 'column'
-               }}>
+              <Paper
+                p="xl"
+                radius="md"
+                withBorder
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
                 <ThemeIcon
                   size={48}
                   radius="md"
@@ -321,7 +325,7 @@ export default function Home() {
                   style={{
                     justifyContent: "space-between",
                     alignItems: "center",
-                    marginTop: 'auto'
+                    marginTop: "auto",
                   }}
                 >
                   <Text fz="2.5rem" fw={700}>
@@ -339,10 +343,15 @@ export default function Home() {
                 </Group>
               </Paper>
 
-              <Paper p="xl" radius="md" withBorder style={{
-                display: 'flex',
-                flexDirection: 'column'
-              }}>
+              <Paper
+                p="xl"
+                radius="md"
+                withBorder
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
                 <ThemeIcon
                   size={48}
                   radius="md"
@@ -359,7 +368,7 @@ export default function Home() {
                   style={{
                     justifyContent: "space-between",
                     alignItems: "center",
-                    marginTop: 'auto'
+                    marginTop: "auto",
                   }}
                 >
                   <Text fz="2.5rem" fw={700}>
@@ -441,7 +450,10 @@ export default function Home() {
                     </Text>
                     <Group gap={8}>
                       <Badge
-                        color={difficultyColors[lastTriedChallenge.difficulty] || 'gray'}
+                        color={
+                          difficultyColors[lastTriedChallenge.difficulty] ||
+                          "gray"
+                        }
                         size="md"
                         variant="filled"
                       >
@@ -477,7 +489,8 @@ export default function Home() {
                 </Text>
               </Group>
               <Text c="dimmed" mb="md">
-                You do not have any ongoing challenges. Browse our collection and start!
+                You do not have any ongoing challenges. Browse our collection
+                and start!
               </Text>
 
               <Button
