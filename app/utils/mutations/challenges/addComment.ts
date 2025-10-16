@@ -11,7 +11,7 @@ export async function addComment(challengeId: string, user_id: string, text: str
         challenge_id: challengeId,
         user_id: user_id,
         text: text,
-        respondTo: respondTo || null
+        respond_to: respondTo || null
     });
 
     if (insertError) {

@@ -21,18 +21,22 @@ export function useDiscussion(challengeId: string) {
         setLoading(true);
         const supabase = createClient();
         try {
-            const { data, error } = await supabase.from('discussions').select('*').eq('challenge_id', challengeId).order('created_at', { ascending: true})
+            const { data, error } = await supabase.from('discussions').select('*, users!discussions_user_id_fkey (username)').eq('challenge_id', challengeId).order('created_at', { ascending: true})
             if(error) {
                 throw new Error(error.message);
             }
-            setDiscussion(data || [])
+
+            const transformedData = data?.map(d => ({
+                ...d,
+                username: d.users?.username || 'unk'
+            }))
+
+            setDiscussion(transformedData || [])
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err));
         } finally {
             setLoading(false);
         }
-
-        
 
     }
 

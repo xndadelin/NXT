@@ -1,11 +1,12 @@
 import { useDiscussion } from "@/app/utils/queries/challenges/discussion/getDiscussion";
 import { Error } from "../../ui/Error";
-import { Card, Text, Group, Title, Badge, Stack, Paper, Avatar, Box } from "@mantine/core";
-import { IconClock, IconMessage } from "@tabler/icons-react";
+import { Card, Text, Group, Title, Badge, Stack, Paper, Avatar, Box, Textarea, Button, Divider } from "@mantine/core";
+import { IconClock, IconMessage, IconPlus, IconSend } from "@tabler/icons-react";
 import useUser from "@/app/utils/queries/user/useUser"
 import { notifications } from "@mantine/notifications";
 import { useState } from "react";
 import { addComment } from "@/app/utils/mutations/challenges/addComment";
+import { setRequestMeta } from "next/dist/server/request-meta";
 interface DiscussionProps {
     challengeId: string;
 }
@@ -68,6 +69,39 @@ export default function Discussion({ challengeId }: DiscussionProps) {
                 <Title order={4}>Discussion</Title>
             </Group>
             <Text c="dimmed">No messages yet. Be the first to start the discussion! Yey!</Text>
+            {user && (
+                <Box mt={"lg"}>
+                    <Group align="flex-start" gap="sm">
+                        <Avatar size={32} radius={"md"} color="blue">
+                            {user.user_metadata?.username ?
+                                user.user_metadata.username.charAt(0).toUpperCase()
+                                : 'u'}
+                        </Avatar>
+                        <Box style={{ flex: 1}}>
+                            <Textarea
+                                placeholder="Add a comment..."
+                                value={newMessage}
+                                autosize
+                                mb="xs"
+                                maxRows={4}
+                                minRows={2}
+                                onChange={(e) => setNewMessage(e.currentTarget.value)}
+                            />
+                            <Group justify="flex-end">
+                                <Button
+                                    size="sm"
+                                    leftSection={<IconSend size={14} />}
+                                    onClick={handleSubmitComment}
+                                    loading={isSubmitting}
+                                    disabled={!newMessage.trim()}
+                                >
+                                    Post
+                                </Button>
+                            </Group>
+                        </Box>
+                    </Group>
+                </Box>
+            )}
         </Card>
     )
 
@@ -75,9 +109,9 @@ export default function Discussion({ challengeId }: DiscussionProps) {
         <Card withBorder p="lg" radius={"md"}>
             <Group mb="lg">
                 <IconMessage size={18} />
-                <Title order={4}>Discussion</Title>
+                <Title order={4}>Comments</Title>
             </Group>
-            <Badge variant="light" color="blue">
+            <Badge variant="light" color="blue" mb="md">
                 {discussion.length} {discussion.length === 1 ? 'message' : 'messages'}
             </Badge>
 
@@ -105,7 +139,20 @@ export default function Discussion({ challengeId }: DiscussionProps) {
                                     </Text>
                                 </div>
                             </Group>
-                            <IconClock size={14} color="var(--mantine-color-dimmed)" />
+                            {user && (
+                                <Button
+                                    variant="outlined"
+                                    color="cyan"
+                                    size="xs"
+                                    onClick={() => {
+                                        setRespondTo(msg.id);
+                                        setShowCommentForm(true)
+                                    }}  
+                                    style={{ marginLeft: 'auto' }}
+                                >
+                                    Reply
+                                </Button>
+                            )}
                         </Group>
 
                         <Box pl="md">
@@ -117,6 +164,42 @@ export default function Discussion({ challengeId }: DiscussionProps) {
                     </Paper>
                 ))}
             </Stack>
+
+            <Divider my="md" />
+
+            {user && (
+                <Box>
+                    <Group align="flex-start" gap="sm">
+                        <Avatar size={32} radius={"md"} color="blue">
+                            {user.user_metadata?.username ?
+                                user.user_metadata.username.charAt(0).toUpperCase()
+                                : 'u'}
+                        </Avatar>
+                        <Box style={{ flex: 1}}>
+                            <Textarea
+                                placeholder="Add a comment..."
+                                value={newMessage}
+                                autosize
+                                mb="xs"
+                                maxRows={4}
+                                minRows={2}
+                                onChange={(e) => setNewMessage(e.currentTarget.value)}
+                            />
+                            <Group justify="flex-end">
+                                <Button
+                                    size="sm"
+                                    leftSection={<IconSend size={14} />}
+                                    onClick={handleSubmitComment}
+                                    loading={isSubmitting}
+                                    disabled={!newMessage.trim()}
+                                >
+                                    Post
+                                </Button>
+                            </Group>
+                        </Box>
+                    </Group>
+                </Box>
+            )}
 
         </Card>
     )
