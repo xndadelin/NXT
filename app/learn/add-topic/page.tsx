@@ -14,17 +14,24 @@ import useUser from "@/app/utils/queries/user/useUser";
 import Loading from "@/app/components/ui/Loading";
 import { Error } from "@/app/components/ui/Error";
 import { useForm } from "@mantine/form";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { Text } from "@mantine/core";
 import MDEditor from "@uiw/react-md-editor";
 import { useDisclosure } from "@mantine/hooks";
 
+interface HeaderItem {
+    id: string;
+    title: string;
+    parentId: string | null;
+}
+
 export default function AddTopicPage() {
   const { user, loading, error } = useUser();
-  const [headers, setHeaders] = useState<string[]>([]);
+  const [headers, setHeaders] = useState<HeaderItem[]>([]);
   const [quizQuestions, setQuizQuestions] = useState<{ question: string, answer: string }[]>([]);
   const [subHeaders, setSubHeaders] = useState<string[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
+  const [finalContent, setFinalContent] = useState<string>('')
 
   const form = useForm({
     initialValues: {
@@ -40,6 +47,141 @@ export default function AddTopicPage() {
       answer: "",
     },
   });
+
+  const onHandleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+  }
+
+  const parseMarkdown = (markdown: string, quizQuestions: { question: string, answer: string}[]) => {
+    const lines = markdown.split('\n');
+
+    const structure: {
+        id: string;
+        level: number;
+        title: string;
+        parentId: string | null;
+        content: string[]
+        quizIds: number[]
+    }[] = [];
+
+    let currentHeader: any = null;
+    let contentBuffer: string[] = [];
+
+    lines.forEach((line) => {
+        const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
+
+        if (headerMatch) {
+            if (currentHeader) {
+                const headerIndex = structure.findIndex(h => h.id === currentHeader.id);
+                if (headerIndex !== -1) {
+                    let start = 0;
+                    let end = contentBuffer.length - 1;
+                    
+                    while (start <= end && contentBuffer[start].trim() === '') start++;
+                    while (end >= start && contentBuffer[end].trim() === '') end--;
+                    
+                    structure[headerIndex].content = contentBuffer.slice(start, end + 1);
+                }
+                contentBuffer = []; 
+            }
+
+            const level = headerMatch[1].length;
+            const title = headerMatch[2].trim();
+            const id = crypto.randomUUID();
+
+            let parentId = null;
+            for (let i = structure.length - 1; i >= 0; i--) {
+                if (structure[i].level < level) {
+                    parentId = structure[i].id;
+                    break;
+                }
+            }
+
+            const newHeader = {
+                id,
+                level,
+                title,
+                parentId,
+                content: [],
+                quizIds: [] as number[],
+            }
+
+            structure.push(newHeader);
+            currentHeader = newHeader;
+        } else if(line.trim().match(/^<(\d+)>$/)) {
+            const quizMatch = line.trim().match(/^<(\d+)>$/);
+            if(quizMatch && currentHeader) {
+                const quizIndex = parseInt(quizMatch[1], 10) - 1;
+                if(quizIndex >= 0 && quizIndex < quizQuestions.length) {
+                    currentHeader.quizIds.push(quizIndex);
+                }
+            }
+        } else { 
+            contentBuffer.push(line);
+        }
+    });
+
+    if (currentHeader) {
+        const headerIndex = structure.findIndex((h) => h.id === currentHeader.id);
+        if (headerIndex !== -1) {
+            let start = 0;
+            let end = contentBuffer.length - 1;
+            
+            while (start <= end && contentBuffer[start].trim() === '') start++;
+            while (end >= start && contentBuffer[end].trim() === '') end--;
+            
+            structure[headerIndex].content = contentBuffer.slice(start, end + 1);
+        }
+    }
+    
+    return structure;
+}
+
+  const generateFinalContent = (structure: any[], quizQuestions: { question: string, answer: string }[]) => {
+    const headerTree = structure.filter(header => !header.parentId)
+
+    const addChildren = (parent: any) => {
+        parent.children = structure.filter(header => header.parentId === parent.id);
+        parent.children.forEach(addChildren)
+        return parent;
+    }
+
+    const tree = headerTree.map(addChildren)
+    const result = [] as TopicNode[];
+
+    type TopicNode = {
+        title: string;
+        level: number;
+        content: string;
+        quizzes: { question: string; answer: string }[];
+        children: TopicNode[];
+    };
+
+    const processNode = (node: any, depth = 0): TopicNode => {
+        const item: TopicNode = {
+            title: node.title,
+            level: node.level,
+            content: node.content.join('\n'),
+            quizzes: node.quizIds.map((id: number) => quizQuestions[id]),
+            children: []
+        };
+
+        if(node.children && node.children.length > 0) {
+            node.children.forEach((child: any) => {
+                item.children.push(processNode(child, depth + 1));
+            });
+        }
+        return item;
+    };
+
+    tree.forEach((node) => {
+        result.push(processNode(node))
+    })
+
+    return result;
+  }
+
+  console.log(generateFinalContent(parseMarkdown(form.values.content, quizQuestions), quizQuestions));
 
   if (loading) return <Loading />;
   if (error) return <Error number={500} />;
@@ -109,16 +251,33 @@ export default function AddTopicPage() {
       </Modal>
       {quizQuestions.map((q, index) => (
         <Paper withBorder shadow="sm" radius="md" mb="md" key={index} p="md">
-        <Group justify="space-between" mb="xs">
-            <Text size="sm" c="dimmed">Question {index + 1}</Text>
-            <Button variant="light" color="red" size="xs" onClick={() => {
-                setQuizQuestions(quizQuestions.filter((_, i) => i !== index))
-            }}>
-                Remove
-            </Button>
-        </Group>
+            <Group justify="space-between" mb="xs">
+                <Text size="sm" c="dimmed">Question {index + 1}</Text>
+                <Button variant="light" color="red" size="xs" onClick={() => {
+                    setQuizQuestions(quizQuestions.filter((_, i) => i !== index))
+                }}>
+                    Remove
+                </Button>
+            </Group>
+
+            <Text fw={600} size="md" mb="md">
+                {q.question}?
+            </Text>
+            
+            <Paper p="xs" withBorder radius={"sm"} bg="var(--mantine-color-dark-7)">
+                <Group gap="xs">
+                    <Text size="sm" fw={500} c="dimmed">Answer: </Text>
+                    <Text size="sm">{q.answer}</Text>
+                </Group>
+            </Paper>
+
         </Paper>
       ))}
+      {quizQuestions.length === 0 && (
+        <Text c="dimmed">
+            No quiz questions added yet. You can add some by clicking that button.
+        </Text>
+      )}
     </Container>
   );
 }
