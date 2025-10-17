@@ -1,5 +1,18 @@
 'use client';
 
+import Loading from "@/app/components/ui/Loading";
+import useUser from "@/app/utils/queries/user/useUser";
+import { notifications } from "@mantine/notifications";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { Error } from "@/app/components/ui/Error";
+import { Container, Title, Text, Group, Button, Paper, Grid, TextInput, ScrollArea } from "@mantine/core"; 
+import { IconListSearch } from "@tabler/icons-react";
+import Link from "next/link";
+import clsx from "clsx";
+import ReactMarkdown from 'react-markdown'
+
 interface TopicSection {
     id: string;
     topic_id: string;
@@ -25,33 +38,24 @@ interface Topic {
     published: boolean;
 }
 
-import Loading from "@/app/components/ui/Loading";
-import useUser from "@/app/utils/queries/user/useUser";
-import { notifications } from "@mantine/notifications";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Error } from "@/app/components/ui/Error";
+type SectionTree = TopicSection & { children: SectionTree[] };
 
 export default function LearnPage() {
     const { id } = useParams();
     const { user, loading: userLoading } = useUser();
 
-
     const [topic, setTopic] = useState<Topic | null>(null);
     const [sections, setSections] = useState<TopicSection[]>([]);
     const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
     const [loading, setLoading] = useState<boolean | null>(false);
-    const [activeSection, setActiveSection] = useState<number | null>(null);
     const [quizInputs, setQuizInputs] = useState<Record<string, string>>({});
-    const [quizResults, setQuizResults] = useState<Record<string, boolean | null>>({});
+    const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
     useEffect(() => {
         async function fetchData() {
             setLoading(true);
             const supabase = createClientComponentClient();
             const { data: topicData } = await supabase.from('topics').select('*').eq('id', id).single();
-
             setTopic(topicData);
 
             const { data: sectionsData } = await supabase.from('topic_sections').select('*').eq('topic_id', id).order('order_index', { ascending: true });
@@ -60,15 +64,10 @@ export default function LearnPage() {
             const { data: quizData } = await supabase.from('quiz_questions').select('*').in('section_id', sectionsData?.map((s: TopicSection) => s.id) ?? [])
             setQuizQuestions(quizData ?? [])
 
-            const sectionsIds = Array.isArray(sectionsData) ? sectionsData.map((s: TopicSection) => s.id) : [];
-            if (sectionsIds.length > 0) {
-                const { data: quizzesData } = await supabase.from('quiz_questions').select('*').in('section_id', sectionsIds);
-                setQuizQuestions(quizzesData ?? [])
-            }
             setLoading(false);
         }
         if(!userLoading) fetchData();
-    }, [id]);
+    }, [id, userLoading]);
 
     const handleInputChange = (quizId: string, value: string) => {
         setQuizInputs(prev => ({...prev, [quizId]: value }));
@@ -77,7 +76,6 @@ export default function LearnPage() {
     const handleQuizSubmit = async(quiz: QuizQuestion) => {
         const supabase = createClientComponentClient();
         const userAnswer = quizInputs[quiz.id];
-
         const { data } = await supabase.from('quiz_questions').select('id').eq('answer', userAnswer).eq('id', quiz.id).single();
         const isCorrect = !!data;
         notifications.show({
@@ -91,5 +89,113 @@ export default function LearnPage() {
     if(!topic) return <Error number={404} />
 
     const getSectionQuizzes = (sectionId: string) => quizQuestions.filter(q => q.section_id === sectionId);
-    
-} 
+
+    function buildTree(sections: TopicSection[], parentId: string | null = null): SectionTree[] {
+        return sections
+            .filter(s => s.parent_id === parentId)
+            .sort((a, b) => a.order_index - b.order_index)
+            .map(s => ({
+                ...s,
+                children: buildTree(sections, s.id)
+            }));
+    }
+
+    const sectionTree = buildTree(sections);
+
+    const tableOfContents = sections
+        .sort((a, b) => a.level - b.level || a.order_index - b.order_index)
+        .map((section) => ({
+            label: section.title,
+            link: `#section-${section.id}`,
+            order: section.level,
+            id: section.id
+        }));
+
+    function TableOfContents() {
+        return (
+            <div>
+                <Group mb="md">
+                    <IconListSearch size={18} stroke={1.5} />
+                    <Text fw={700}>Table of contents</Text>
+                </Group>
+                {tableOfContents.map((item) => (
+                    <Text
+                        component={Link}
+                        href={item.link}
+                        key={item.id}
+                        style={{
+                            paddingLeft: `calc(${item.order} * var(--mantine-spacing-md))`,
+                            display: "block",
+                            marginBottom: 4
+                        }}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            sectionRefs.current[item.id]?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                    >
+                        {item.label}
+                    </Text>
+                ))}
+            </div>
+        )
+    }
+
+    function RenderSection({ section }: { section: SectionTree }) {
+        return (
+            <div
+                id={`section-${section.id}`}
+                ref={el => { sectionRefs.current[section.id] = el;}}
+                style={{ marginBottom: 32 }}
+            >
+                <Title order={Math.min(section.level + 1, 6) as 1 | 2 | 3 | 4 | 5 | 6} mb="md">
+                    {section.title}
+                </Title>
+                <ReactMarkdown>{section.content}</ReactMarkdown>
+                {getSectionQuizzes(section.id).length > 0 && (
+                    getSectionQuizzes(section.id).map((quiz) => (
+                        <div key={quiz.id} style={{ margin: "24px 0" }}>
+                            <Text mb="sm">{quiz.question}</Text>
+                            <Group>
+                                <TextInput
+                                    value={quizInputs[quiz.id] || ''}
+                                    onChange={(e) => handleInputChange(quiz.id, e.currentTarget.value)}
+                                    style={{ flex: 1, marginRight: 0 }}
+                                />
+                                <Button
+                                    variant="light"
+                                    onClick={() => handleQuizSubmit(quiz)}
+                                >
+                                    Check
+                                </Button>
+                            </Group>
+                        </div>
+                    ))
+                )}
+                {section.children && section.children.map(child => (
+                    <RenderSection section={child} key={child.id} />
+                ))}
+            </div>
+        );
+    }
+
+    return (
+        <Container size="lg">
+            <Grid>
+                <Grid.Col span={{ base: 12, md: 8 }}>
+                    <Title order={1} mb="sm">{topic.title}</Title>
+                    <Text c="dimmed" mb="xl">{topic.short_description}</Text>
+                    {sectionTree.map(section => (
+                        <RenderSection section={section} key={section.id} />
+                    ))}
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, md: 4 }}>
+                    <ScrollArea h={500}>
+                        <Paper withBorder p="md" shadow="sm">
+                            <TableOfContents />
+                        </Paper>
+                    </ScrollArea>
+                </Grid.Col>
+            </Grid>
+        </Container>
+    )
+}
