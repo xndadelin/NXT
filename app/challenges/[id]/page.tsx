@@ -49,6 +49,7 @@ import { useRouter } from "next/navigation";
 import deleteChallenge from "@/app/utils/queries/challenges/deleteChallenge";
 import Discussion from "@/app/components/challenge/discussion/Discussion";
 import { useVoteChallenge } from "@/app/utils/mutations/challenges/useChallengeVotes";
+import MDEditor from "@uiw/react-md-editor";
 
 export default function ChallengePage() {
   const { id } = useParams();
@@ -186,16 +187,7 @@ export default function ChallengePage() {
             <Divider mb="md" />
 
             <Box mt="md">
-              <Text
-                size="md"
-                lh={1.6}
-                style={{ whiteSpace: "pre-wrap" }}
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(challenge.description, {
-                    USE_PROFILES: { html: true, svg: true },
-                  }),
-                }}
-              />
+              <MDEditor.Markdown source={challenge.description} />
             </Box>
 
             {challenge.resource && (
