@@ -155,7 +155,7 @@ export default function ChallengePage() {
                   color="orange"
                   size="xs"
                   radius={"xl"}
-                  onClick={() => {vote(1); fetchVotes(); }}
+                  onClick={async() => {await vote(1); fetchVotes(); }}
                   leftSection={<IconArrowUp size={14} />}
                 >
                   Upvote
@@ -163,14 +163,14 @@ export default function ChallengePage() {
               </Group>
               <Text fw={700} fz={18} mx={4}>
                 {votes.upvotes} <IconArrowUp size={14} style={{ verticalAlign: 'middle'}} /> /{" "}
-                -{votes.downvotes} <IconArrowDown size={14} style={{ verticalAlign: 'middle'}} />
+                {votes.downvotes} <IconArrowDown size={14} style={{ verticalAlign: 'middle'}} />
               </Text>
               <Button
                 variant={userVote === -1 ? "filled" : "light"}
                 color="cyan"
                 size="xs"
                 radius={"xl"}
-                onClick={() => {vote(-1); fetchVotes(); }}
+                onClick={async() => {await vote(-1); fetchVotes(); }}
                 leftSection={<IconArrowDown size={15} />}
                 disabled={!user}
               >
