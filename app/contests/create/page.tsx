@@ -8,6 +8,7 @@ import useChallenges from "@/app/utils/queries/challenges/getChallenges";
 import { useState } from "react";
 import { useForm } from "@mantine/form";
 import { DateTimePicker } from "@mantine/dates"
+import '@mantine/dates/styles.css';
 
 export default function CreateContest() {
     const {user, loading, error} = useUser();
