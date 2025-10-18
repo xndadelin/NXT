@@ -85,9 +85,7 @@ export default function EditWriteup() {
             color: 'green'
         })
 
-        router.push(`/writeups/${id}`)
-
-        
+        router.push(`/writeups/${id}`)        
     }
 
     if(loading || writeupLoading) return <Loading />;

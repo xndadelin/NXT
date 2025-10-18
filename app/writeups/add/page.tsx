@@ -14,6 +14,8 @@ import { FormEvent } from "react";
 import { createClient } from "@/app/utils/supabase/client";
 import useUser from "@/app/utils/queries/user/useUser";
 import { notifications } from "@mantine/notifications";
+import Loading from "@/app/components/ui/Loading";
+import { Error } from "@/app/components/ui/Error";
 
 export interface Challenge {
   id: string;
@@ -70,8 +72,11 @@ export default function WriteupFormPage() {
         form.reset();
     }
 
+    if (loading) return <Loading />;
+    if (error || !user) return <Error number={500} />
+
     return (
-        <Container pt="xl">
+        <Container pt="xl" >
             <Title mb="lg">Add new writeup</Title>
             <form onSubmit={handleSubmit}> 
                 <TextInput
