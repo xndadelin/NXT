@@ -13,10 +13,12 @@ import MDEditor from "@uiw/react-md-editor";
 export default function Writeup() {
     const { id } = useParams();
     const { writeup, loading, error } = useWriteup(id as string, 'view');
+    const [loadingUser, setLoadingUser] = useState<boolean>(true);
     const [username, setUsername] = useState<string>('');
 
     useEffect(() => {
       const getUserUsername = async (authorId: string) => {
+        setLoadingUser(true);
         const supabase = createClient();
         const { data, error } = await supabase
           .from("users")
@@ -28,6 +30,7 @@ export default function Writeup() {
           setUsername('a gracious hacker!')
         }
         setUsername(data?.username);
+        setLoadingUser(false);
       };
 
       if(writeup && typeof writeup.author_id === 'string') {
@@ -36,7 +39,7 @@ export default function Writeup() {
 
     }, [writeup?.author_id]);
 
-    if(loading) return <Loading />;
+    if(loading || loadingUser) return <Loading />;
     if(error) return <Error number={500} />
     if(!writeup) return <Error number={404} />;
 
