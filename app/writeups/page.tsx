@@ -35,8 +35,7 @@ export default function Writeups() {
                             href={`/writeups/${writeup.id}`}
                             fz={22}
                             fw={600}
-                            style={{ color: 'var(--mantine-color-blue-4'}}
-
+                            style={{ color: 'var(--mantine-color-blue-4)' }}
                         >
                             {writeup.title}
                         </Anchor>

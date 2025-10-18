@@ -9,6 +9,7 @@ import { createClient } from "@/app/utils/supabase/client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import MDEditor from "@uiw/react-md-editor";
+import Comments from "@/app/components/writeup/Comments";
 
 export default function Writeup() {
     const { id } = useParams();
@@ -51,9 +52,10 @@ export default function Writeup() {
             <Text component={Link} href={`/users/${writeup.author_id}`} c="dimmed" fz="sm" mb="md">
                 By @{username}
             </Text>
-            <div className="markdown-body" style={{ marginTop: '1rem' }}>
+            <div className="markdown-body" style={{ marginTop: '1rem', marginBottom: '2rem' }}>
                 <MDEditor.Markdown source={writeup.content_markdown} />
             </div>
+            <Comments writeupId={writeup.id} />
             <div style={{ height: "4rem" }}></div>
         </Container>
     )
