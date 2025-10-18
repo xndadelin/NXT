@@ -14,12 +14,13 @@ import useUser from "@/app/utils/queries/user/useUser";
 import Loading from "@/app/components/ui/Loading";
 import { Error } from "@/app/components/ui/Error";
 import { useForm } from "@mantine/form";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Text } from "@mantine/core";
 import MDEditor from "@uiw/react-md-editor";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useParams } from "next/navigation";
 
 interface ParsedHeader {
     id: string;
@@ -32,10 +33,82 @@ interface ParsedHeader {
     order: number;
 }
 
-export default function AddTopicPage() {
-  const { user, loading, error } = useUser();
+interface TopicSection {
+    id: string;
+    topic_id: string;
+    title: string;
+    content: string;
+    level: number;
+    parent_id: string | null;
+    order_index: number;
+}
+
+interface QuizQuestion {
+    id: string;
+    section_id: string;
+    question: string;
+    answer: string[];
+}
+
+interface Topic {
+    id: string;
+    title: string;
+    short_description: string;
+    created_at: string;
+    published: boolean;
+    whole_content: string;
+}
+
+type SectionTree = TopicSection & { children: SectionTree[] };
+
+export default function EditTopicPage() {
+  const { user, loading: userLoading, error } = useUser();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [topic, setTopic] = useState<Topic | null>(null);
+  const [sections, setSections] = useState<TopicSection[]>([]);
+  const [sectionTree, setSectionTree] = useState<SectionTree[]>([]);
+  const { id } = useParams();
   const [quizQuestions, setQuizQuestions] = useState<{ question: string, answer: string }[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
+
+    useEffect(() => {
+      async function fetchData() {
+        setLoading(true);
+        const supabase = createClientComponentClient();
+        const { data: topicData } = await supabase
+          .from("topics")
+          .select("*")
+          .eq("id", id)
+          .single();
+        setTopic(topicData);
+
+        const { data: sectionsData } = await supabase
+          .from("topic_sections")
+          .select("*")
+          .eq("topic_id", id)
+          .order("order_index", { ascending: true });
+        setSections(sectionsData ?? []);
+
+        const { data: quizData } = await supabase
+          .from("quiz_questions")
+          .select("*")
+          .in("section_id", sectionsData?.map((s: TopicSection) => s.id) ?? []);
+        setQuizQuestions(quizData ?? []);
+
+        setLoading(false);
+      }
+      if (!userLoading) fetchData();
+    }, [id, userLoading]);
+
+  useEffect(() => {
+    if(topic) {
+      form.setValues({
+        title: topic.title,
+        shortDescription: topic.short_description,
+        content: topic.whole_content
+      })
+    }
+  }, [topic])
 
   const form = useForm({
     initialValues: {
@@ -67,11 +140,13 @@ export default function AddTopicPage() {
         const result = generateFinalContent(parseMarkdown(form.values.content, quizQuestions), quizQuestions);
 
         const supabase = createClientComponentClient();
-        const { error } = await supabase.rpc('insert_topic', {
+        console.log(result)
+        const { error } = await supabase.rpc('edit_topic', {
             p_title: form.values.title,
             p_short_description: form.values.shortDescription,
             p_author_id: user?.id || '',
             p_content: result,
+            p_topic_id: id,
             p_whole_content: form.values.content
         })
 
@@ -86,7 +161,7 @@ export default function AddTopicPage() {
 
         notifications.show({
             title: 'Success',
-            message: 'topic created!',
+            message: 'topic edited!',
             color: 'green'
         })
     } catch(error) {
@@ -243,14 +318,14 @@ export default function AddTopicPage() {
     return result;
   }
 
-  if (loading) return <Loading />;
+  if (userLoading) return <Loading />;
   if (error) return <Error number={500} />;
   if (!user || !user.user_metadata?.admin) return <Error number={401} />;
 
   return (
     <Container>
       <Title size="xl" fw={700} my="md" order={3} style={{ fontSize: "2rem" }}>
-        Add a new topic
+        Edit topic
       </Title>
       <TextInput
         label="Title"
@@ -340,7 +415,7 @@ export default function AddTopicPage() {
       )}
       <form onSubmit={onHandleSubmit}>
         <Button type="submit" my="md" >
-            Create topic
+            Edit topic
         </Button>
      </form>
      </Container>

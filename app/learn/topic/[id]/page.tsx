@@ -5,7 +5,7 @@ import useUser from "@/app/utils/queries/user/useUser";
 import { notifications } from "@mantine/notifications";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Error } from "@/app/components/ui/Error";
 import { Container, Title, Text, Group, Button, Paper, Grid, TextInput, ScrollArea, Box } from "@mantine/core"; 
 import { IconListSearch } from "@tabler/icons-react";
@@ -53,6 +53,7 @@ export default function LearnPage() {
     const [loading, setLoading] = useState<boolean | null>(false);
     const [quizInputs, setQuizInputs] = useState<Record<string, string>>({});
     const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+    const sectionTree = useMemo(() => buildTree(sections), [sections]);
 
     useEffect(() => {
         async function fetchData() {
@@ -62,9 +63,13 @@ export default function LearnPage() {
             setTopic(topicData);
 
             const { data: sectionsData } = await supabase.from('topic_sections').select('*').eq('topic_id', id).order('order_index', { ascending: true });
-            setSections(sectionsData ?? []);
+            
+            const uniqueSections = Array.from(
+              new Map((sectionsData ?? []).map(s => [s.id, s])).values()
+            );
+            setSections(uniqueSections);
 
-            const { data: quizData } = await supabase.from('quiz_questions').select('*').in('section_id', sectionsData?.map((s: TopicSection) => s.id) ?? [])
+            const { data: quizData } = await supabase.from('quiz_questions').select('*').in('section_id', uniqueSections.map((s: TopicSection) => s.id))
             setQuizQuestions(quizData ?? [])
 
             setLoading(false);
@@ -102,8 +107,6 @@ export default function LearnPage() {
                 children: buildTree(sections, s.id)
             }));
     }
-
-    const sectionTree = buildTree(sections);
 
     const tableOfContents = sections
         .sort((a, b) => a.level - b.level || a.order_index - b.order_index)
@@ -200,7 +203,32 @@ export default function LearnPage() {
         )
     }
 
-    function RenderSection({ section }: { section: SectionTree }) {
+    function QuizInput({ quiz, onSubmit, initialValue }: { quiz: QuizQuestion, onSubmit: (value: string) => void, initialValue: string }) {
+        const [value, setValue] = useState(initialValue)
+        useEffect(() => {
+            setValue(initialValue);
+        }, [initialValue]);
+
+        return (
+            <Group>
+                <TextInput
+                    value={value}
+                    onChange={(e) => setValue(e.currentTarget.value)}
+                    style={{ flex :1, marginRight: 0}}
+                />
+                <Button
+                    variant="light"
+                    onClick={() => onSubmit(value)}
+                >
+                    Check
+                </Button>
+
+            </Group>
+        )
+
+    }
+
+    const RenderSection = memo(function RenderSection({ section }: { section: SectionTree }) {
         return (
             <div
                 id={`section-${section.id}`}
@@ -214,19 +242,14 @@ export default function LearnPage() {
                     getSectionQuizzes(section.id).map((quiz) => (
                         <div key={quiz.id} style={{ margin: "24px 0" }}>
                             <Text mb="sm">{quiz.question}</Text>
-                            <Group>
-                                <TextInput
-                                    value={quizInputs[quiz.id] || ''}
-                                    onChange={(e) => handleInputChange(quiz.id, e.currentTarget.value)}
-                                    style={{ flex: 1, marginRight: 0 }}
-                                />
-                                <Button
-                                    variant="light"
-                                    onClick={() => handleQuizSubmit(quiz)}
-                                >
-                                    Check
-                                </Button>
-                            </Group>
+                            <QuizInput
+                                quiz={quiz}
+                                initialValue={quizInputs[quiz.id] || ''}
+                                onSubmit={(value) => {
+                                    handleInputChange(quiz.id, value);
+                                    handleQuizSubmit( {...quiz, answer: [value]} )
+                                }}
+                            />
                         </div>
                     ))
                 )}
@@ -235,7 +258,7 @@ export default function LearnPage() {
                 ))}
             </div>
         );
-    }
+    })
 
     return (
         <Container size="lg">
