@@ -9,6 +9,7 @@ import {
   Modal,
   Paper,
   Group,
+  Checkbox,
 } from "@mantine/core";
 import useUser from "@/app/utils/queries/user/useUser";
 import Loading from "@/app/components/ui/Loading";
@@ -42,6 +43,7 @@ export default function AddTopicPage() {
       title: "",
       shortDescription: "",
       content: "",
+      published: false,
     },
   });
 
@@ -72,7 +74,8 @@ export default function AddTopicPage() {
             p_short_description: form.values.shortDescription,
             p_author_id: user?.id || '',
             p_content: result,
-            p_whole_content: form.values.content
+            p_whole_content: form.values.content,
+            p_published: form.values.published
         })
 
         if(error) {
@@ -338,6 +341,12 @@ export default function AddTopicPage() {
             No quiz questions added yet. You can add some by clicking that button.
         </Text>
       )}
+      <Checkbox
+        label="Published"
+        checked={form.values.published}
+        onChange={(e) => form.setFieldValue('published', e.currentTarget.checked)}
+        my="md"
+      />
       <form onSubmit={onHandleSubmit}>
         <Button type="submit" my="md" >
             Create topic
