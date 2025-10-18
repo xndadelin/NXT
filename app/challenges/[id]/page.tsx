@@ -149,34 +149,6 @@ export default function ChallengePage() {
                 </Badge>
               </Group>
 
-              <Group align="centrer" gap={8} mb="md">
-                <Button
-                  variant={userVote === 1 ? "filled" : "light"}
-                  color="orange"
-                  size="xs"
-                  radius={"xl"}
-                  onClick={async() => {await vote(1); fetchVotes(); }}
-                  leftSection={<IconArrowUp size={14} />}
-                >
-                  Upvote
-                </Button>
-              </Group>
-              <Text fw={700} fz={18} mx={4}>
-                {votes.upvotes} <IconArrowUp size={14} style={{ verticalAlign: 'middle'}} /> /{" "}
-                {votes.downvotes} <IconArrowDown size={14} style={{ verticalAlign: 'middle'}} />
-              </Text>
-              <Button
-                variant={userVote === -1 ? "filled" : "light"}
-                color="cyan"
-                size="xs"
-                radius={"xl"}
-                onClick={async() => {await vote(-1); fetchVotes(); }}
-                leftSection={<IconArrowDown size={15} />}
-                disabled={!user}
-              >
-                Downvote
-              </Button>
-
               {user?.user_metadata?.admin && (
                 <Menu shadow="md" width={200} position="bottom-end">
                   <Menu.Target>
@@ -351,7 +323,7 @@ export default function ChallengePage() {
               </List.Item>
             </List>
           </Card>
-          <Card shadow="sm" p="lg" radius={"md"} withBorder>
+          <Card shadow="sm" p="lg" mb="md" radius={"md"} withBorder>
             <Title order={4} mb="md" fw={600}>
               Need help?
             </Title>
@@ -393,7 +365,48 @@ export default function ChallengePage() {
               Writeups
             </Button>
           </Card>
+          <Card shadow="sm" p="lg" radius={"md"} withBorder>
+            <Group align="center" gap={8} mt="md" justify="center">
+              <Button
+                variant={userVote === 1 ? "filled" : "light"}
+                color="orange"
+                size="xs"
+                radius={"xl"}
+                onClick={async () => {
+                  await vote(1);
+                  fetchVotes();
+                }}
+                leftSection={<IconArrowUp size={14} />}
+                disabled={!user}
+                style={{ flex: 1 }}
+              >
+                Upvote
+              </Button>
+              <Text fw={700} fz={18} mx={4} style={{ flex: 1, textAlign: 'center'}}>
+                {votes.upvotes}{" "}
+                <IconArrowUp size={14} style={{ verticalAlign: "middle" }} /> /{" "}
+                {votes.downvotes}{" "}
+                <IconArrowDown size={14} style={{ verticalAlign: "middle" }} />
+              </Text>
+              <Button
+                variant={userVote === -1 ? "filled" : "light"}
+                color="cyan"
+                size="xs"
+                radius={"xl"}
+                onClick={async () => {
+                  await vote(-1);
+                  fetchVotes();
+                }}
+                leftSection={<IconArrowDown size={14} />}
+                disabled={!user}
+                style={{ flex: 1}}
+              >
+                Downvote
+              </Button>
+            </Group>
+          </Card>
         </Grid.Col>
+        <Grid.Col span={12}></Grid.Col>
       </Grid>
     </Container>
   );
