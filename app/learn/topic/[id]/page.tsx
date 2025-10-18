@@ -14,7 +14,6 @@ import clsx from "clsx";
 import MDEditor from "@uiw/react-md-editor";
 import classes from '@/app/styles/Learn.module.css'
 import "@uiw/react-markdown-preview/markdown.css";
-import { table } from "console";
 
 
 interface TopicSection {
@@ -118,6 +117,58 @@ export default function LearnPage() {
     function TableOfContents() {
         const [active, setActive] = useState<string | null>(null);
 
+          useEffect(() => {
+            const sectionIds = tableOfContents.map((item) => item.id);
+
+            const observer = new window.IntersectionObserver(
+              (entries) => {
+                const visibleEntries = entries.filter((e) => e.isIntersecting);
+
+                if (visibleEntries.length > 0) {
+                  const topmost = visibleEntries.sort(
+                    (a, b) =>
+                      a.target.getBoundingClientRect().top -
+                      b.target.getBoundingClientRect().top
+                  )[0];
+
+                  const sectionId = topmost.target.id.replace("section-", "");
+                  setActive(`#section-${sectionId}`);
+                } else {
+                  const allElements = sectionIds
+                    .map((id) => {
+                      const el = sectionRefs.current[id];
+                      if (!el) return null;
+                      const rect = el.getBoundingClientRect();
+                      return { id, rect, distance: Math.abs(rect.top) };
+                    })
+                    .filter(Boolean);
+
+                  if (allElements.length > 0) {
+                    const closest = allElements.sort(
+                      (a, b) => {
+                        if (!a || !b) return 0;
+                        return a.distance - b.distance;
+                      }
+                    )[0];
+                    setActive(`#section-${closest?.id}`);
+                  }
+                }
+              },
+              {
+                rootMargin: "-100px 0px -80% 0px",
+                threshold: 0,
+              }
+            );
+
+            sectionIds.forEach((id) => {
+              const el = sectionRefs.current[id];
+              if (el) observer.observe(el);
+            });
+
+            return () => observer.disconnect();
+          }, [tableOfContents]);
+
+
         return (
             <div>
                 <Group mb="md">
@@ -203,6 +254,7 @@ export default function LearnPage() {
                     {sectionTree.map(section => (
                         <RenderSection section={section} key={section.id} />
                     ))}
+                    <div style={{ height: 500 }} />
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, md: 4 }} >
                     <div style={{
