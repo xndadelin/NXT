@@ -12,7 +12,7 @@ export interface Challenge {
   created_at: string;
 }
 
-export default function useChallenges() {
+export default function useChallenges({ method }: { method: "public" | "private" }) {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +22,7 @@ export default function useChallenges() {
     async function fetchChallenges() {
       try {
         const supabase = createClient();
-        const { data, error } = await supabase.from("challenges").select("*");
+        const { data, error } = await supabase.from("challenges").select("*").eq("private", method === "private");
 
         if (error) {
           throw error;

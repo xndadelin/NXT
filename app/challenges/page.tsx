@@ -38,7 +38,7 @@ export interface Challenge {
 }
 
 function Challenges() {
-  const { challenges, loading, error, solvedChallenges } = useChallenges();
+  const { challenges, loading, error, solvedChallenges } = useChallenges({method: "public"});
   const { user } = useUser();
   const [sortDirection, setSortDirection] = useState<number[]>([0, 0, 0, 0, 0]);
   const [sortedChallenges, setSortedChallenges] = useState<Challenge[]>([]);
