@@ -81,9 +81,8 @@ export default function LearnPage() {
         setQuizInputs(prev => ({...prev, [quizId]: value }));
     }
 
-    const handleQuizSubmit = async(quiz: QuizQuestion) => {
+    const handleQuizSubmit = async(quiz: QuizQuestion, userAnswer: string) => {
         const supabase = createClientComponentClient();
-        const userAnswer = quizInputs[quiz.id];
         const { data } = await supabase.from('quiz_questions').select('id').eq('answer', userAnswer).eq('id', quiz.id).single();
         const isCorrect = !!data;
         notifications.show({
@@ -247,7 +246,7 @@ export default function LearnPage() {
                                 initialValue={quizInputs[quiz.id] || ''}
                                 onSubmit={(value) => {
                                     handleInputChange(quiz.id, value);
-                                    handleQuizSubmit( {...quiz, answer: [value]} )
+                                    handleQuizSubmit(quiz, value);
                                 }}
                             />
                         </div>

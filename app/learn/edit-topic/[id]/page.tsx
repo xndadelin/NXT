@@ -140,7 +140,7 @@ export default function EditTopicPage() {
         const result = generateFinalContent(parseMarkdown(form.values.content, quizQuestions), quizQuestions);
 
         const supabase = createClientComponentClient();
-        console.log(result)
+        
         const { error } = await supabase.rpc('edit_topic', {
             p_title: form.values.title,
             p_short_description: form.values.shortDescription,
