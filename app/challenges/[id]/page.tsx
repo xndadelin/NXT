@@ -37,6 +37,8 @@ import {
   IconShield,
   IconTrash,
   IconTrophy,
+  IconArrowUp,
+  IconArrowDown
 } from "@tabler/icons-react";
 import { FormEvent, useEffect, useState } from "react";
 import checkIfDone from "@/app/utils/queries/challenges/checkIfDone";
@@ -46,6 +48,7 @@ import useUser from "@/app/utils/queries/user/useUser";
 import { useRouter } from "next/navigation";
 import deleteChallenge from "@/app/utils/queries/challenges/deleteChallenge";
 import Discussion from "@/app/components/challenge/discussion/Discussion";
+import { useVoteChallenge } from "@/app/utils/mutations/challenges/useChallengeVotes";
 
 export default function ChallengePage() {
   const { id } = useParams();
@@ -56,6 +59,7 @@ export default function ChallengePage() {
   const router = useRouter();
   const [flagValue, setFlagValue] = useState<string>("");
   const [pressedHints, setPressedHints] = useState<boolean>(false);
+  const { votes, userVote, loading: votesLoading, vote, votingError, fetchVotes } = useVoteChallenge(challengeId, user?.id)
 
   useEffect(() => {
     async function fetchDone() {
@@ -64,6 +68,16 @@ export default function ChallengePage() {
     }
     fetchDone();
   }, [challengeId]);
+  
+  useEffect(() => {
+    if(votingError) {
+      notifications.show({
+        title: 'Oops, something went wrong!',
+        message: votingError,
+        color: 'red'
+      })
+    }
+  }, [votingError]);
 
   if (loading) return <Loading />;
   if (error) return <Error number={500} />;
@@ -134,6 +148,34 @@ export default function ChallengePage() {
                   {challenge.difficulty}
                 </Badge>
               </Group>
+
+              <Group align="centrer" gap={8} mb="md">
+                <Button
+                  variant={userVote === 1 ? "filled" : "light"}
+                  color="orange"
+                  size="xs"
+                  radius={"xl"}
+                  onClick={() => {vote(1); fetchVotes(); }}
+                  leftSection={<IconArrowUp size={14} />}
+                >
+                  Upvote
+                </Button>
+              </Group>
+              <Text fw={700} fz={18} mx={4}>
+                {votes.upvotes} <IconArrowUp size={14} style={{ verticalAlign: 'middle'}} /> /{" "}
+                -{votes.downvotes} <IconArrowDown size={14} style={{ verticalAlign: 'middle'}} />
+              </Text>
+              <Button
+                variant={userVote === -1 ? "filled" : "light"}
+                color="cyan"
+                size="xs"
+                radius={"xl"}
+                onClick={() => {vote(-1); fetchVotes(); }}
+                leftSection={<IconArrowDown size={15} />}
+                disabled={!user}
+              >
+                Downvote
+              </Button>
 
               {user?.user_metadata?.admin && (
                 <Menu shadow="md" width={200} position="bottom-end">
