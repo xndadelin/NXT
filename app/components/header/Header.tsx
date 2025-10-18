@@ -41,6 +41,7 @@ export default function Header() {
       "Leaderboard",
       "Learn",
       "Writeups",
+      "Contests",
     ];
     if (validTabs.includes(formattedPath)) {
       setActiveTab(formattedPath);
@@ -57,7 +58,7 @@ export default function Header() {
     image: user_data?.user_metadata?.avatar_url || null,
   };
 
-  const tabs = ["Home", "Challenges", "Leaderboard", "Learn", "Writeups"].map(
+  const tabs = ["Home", "Challenges", "Leaderboard", "Learn", "Writeups", "Contests"].map(
     (tab) => (
       <Tabs.Tab value={tab} key={tab}>
         {tab}
