@@ -14,6 +14,7 @@ import clsx from "clsx";
 import MDEditor from "@uiw/react-md-editor";
 import classes from '@/app/styles/Learn.module.css'
 import "@uiw/react-markdown-preview/markdown.css";
+import { table } from "console";
 
 
 interface TopicSection {
@@ -188,19 +189,32 @@ export default function LearnPage() {
     return (
         <Container size="lg">
             <Grid style={{ marginBottom: 100 }}>
-                <Grid.Col span={{ base: 12, md: 8 }} className="markdown-body">
-                    <Title mb="md">{topic.title}</Title>
+                <Grid.Col
+                    style={{
+                        height: 'calc(100vh - 100px)',
+                        overflowY: 'auto',
+                        paddingRight: '2rem'
+                    }}
+                    span={{ base: 12, md: 8 }}
+                    className={clsx("markdown-body", classes.hideScrollbar)}
+                >
+                    <Title mt={0} mb="md">{topic.title}</Title>
                     <Text c="dimmed">{topic.short_description}</Text>
                     {sectionTree.map(section => (
                         <RenderSection section={section} key={section.id} />
                     ))}
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, md: 4 }} >
-                    <ScrollArea>
-                        <Paper p="md" shadow="sm">
-                            <TableOfContents />
-                        </Paper>
-                    </ScrollArea>
+                    <div style={{
+                        position: 'sticky',
+                        top: 32
+                    }}>
+                        <ScrollArea>
+                            <Paper p="md" shadow="sm">
+                                <TableOfContents />
+                            </Paper>
+                        </ScrollArea>
+                    </div>
                 </Grid.Col>
             </Grid>
         </Container>

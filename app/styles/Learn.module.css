@@ -21,3 +21,10 @@
   color: var(--mantine-color-blue-4);
   background-color: var(--mantine-color-blue-light) !important;
 }
+
+.hideScrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
