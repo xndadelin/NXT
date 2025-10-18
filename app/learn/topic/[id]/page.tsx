@@ -7,11 +7,12 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Error } from "@/app/components/ui/Error";
-import { Container, Title, Text, Group, Button, Paper, Grid, TextInput, ScrollArea } from "@mantine/core"; 
+import { Container, Title, Text, Group, Button, Paper, Grid, TextInput, ScrollArea, Box } from "@mantine/core"; 
 import { IconListSearch } from "@tabler/icons-react";
 import Link from "next/link";
 import clsx from "clsx";
-import ReactMarkdown from 'react-markdown'
+import MDEditor from "@uiw/react-md-editor";
+import classes from '@/app/styles/Learn.module.css'
 
 interface TopicSection {
     id: string;
@@ -112,6 +113,8 @@ export default function LearnPage() {
         }));
 
     function TableOfContents() {
+        const [active, setActive] = useState<string | null>(null);
+
         return (
             <div>
                 <Group mb="md">
@@ -119,22 +122,25 @@ export default function LearnPage() {
                     <Text fw={700}>Table of contents</Text>
                 </Group>
                 {tableOfContents.map((item) => (
-                    <Text
+                    <Box
                         component={Link}
                         href={item.link}
                         key={item.id}
                         style={{
                             paddingLeft: `calc(${item.order} * var(--mantine-spacing-md))`,
                             display: "block",
-                            marginBottom: 4
                         }}
+                        className={clsx(classes.link, {
+                            [classes.linkActive]: active === item.link
+                        })}
                         onClick={(e) => {
                             e.preventDefault();
+                            setActive(item.link);
                             sectionRefs.current[item.id]?.scrollIntoView({ behavior: 'smooth' });
                         }}
                     >
                         {item.label}
-                    </Text>
+                    </Box>
                 ))}
             </div>
         )
@@ -145,12 +151,11 @@ export default function LearnPage() {
             <div
                 id={`section-${section.id}`}
                 ref={el => { sectionRefs.current[section.id] = el;}}
-                style={{ marginBottom: 32 }}
             >
-                <Title order={Math.min(section.level + 1, 6) as 1 | 2 | 3 | 4 | 5 | 6} mb="md">
+                <Title mb={0} mt={section.level === 1 ? 0 : 32} order={Math.min(section.level + 1, 6) as 1 | 2 | 3 | 4 | 5 | 6}>
                     {section.title}
                 </Title>
-                <ReactMarkdown>{section.content}</ReactMarkdown>
+                <MDEditor.Markdown source={section.content} />
                 {getSectionQuizzes(section.id).length > 0 && (
                     getSectionQuizzes(section.id).map((quiz) => (
                         <div key={quiz.id} style={{ margin: "24px 0" }}>
@@ -181,16 +186,16 @@ export default function LearnPage() {
     return (
         <Container size="lg">
             <Grid>
-                <Grid.Col span={{ base: 12, md: 8 }}>
+                <Grid.Col span={{ base: 12, md: 8 }} className="markdown-body">
                     <Title order={1} mb="sm">{topic.title}</Title>
                     <Text c="dimmed" mb="xl">{topic.short_description}</Text>
                     {sectionTree.map(section => (
                         <RenderSection section={section} key={section.id} />
                     ))}
                 </Grid.Col>
-                <Grid.Col span={{ base: 12, md: 4 }}>
-                    <ScrollArea h={500}>
-                        <Paper withBorder p="md" shadow="sm">
+                <Grid.Col span={{ base: 12, md: 4 }} >
+                    <ScrollArea>
+                        <Paper p="md" shadow="sm">
                             <TableOfContents />
                         </Paper>
                     </ScrollArea>
