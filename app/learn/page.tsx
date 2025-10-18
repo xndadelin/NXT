@@ -58,7 +58,7 @@ function Learn() {
   if (userError || error) return <Error number={500} />
 
   return (
-    <Container size={"xl"}>
+    <Container>
       <Grid justify="space-between" align="center" mb="md">
        <Grid.Col span={"content"}>
          <Text size="xl" fw={700} my="md">Learn</Text>

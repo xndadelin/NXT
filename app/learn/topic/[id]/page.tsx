@@ -13,6 +13,8 @@ import Link from "next/link";
 import clsx from "clsx";
 import MDEditor from "@uiw/react-md-editor";
 import classes from '@/app/styles/Learn.module.css'
+import "@uiw/react-markdown-preview/markdown.css";
+
 
 interface TopicSection {
     id: string;
@@ -152,7 +154,7 @@ export default function LearnPage() {
                 id={`section-${section.id}`}
                 ref={el => { sectionRefs.current[section.id] = el;}}
             >
-                <Title mb={0} mt={section.level === 1 ? 0 : 32} order={Math.min(section.level + 1, 6) as 1 | 2 | 3 | 4 | 5 | 6}>
+                <Title mb={0} order={Math.min(section.level + 1, 6) as 1 | 2 | 3 | 4 | 5 | 6}>
                     {section.title}
                 </Title>
                 <MDEditor.Markdown source={section.content} />
@@ -185,10 +187,10 @@ export default function LearnPage() {
 
     return (
         <Container size="lg">
-            <Grid>
+            <Grid style={{ marginBottom: 100 }}>
                 <Grid.Col span={{ base: 12, md: 8 }} className="markdown-body">
-                    <Title order={1} mb="sm">{topic.title}</Title>
-                    <Text c="dimmed" mb="xl">{topic.short_description}</Text>
+                    <Title mb="md">{topic.title}</Title>
+                    <Text c="dimmed">{topic.short_description}</Text>
                     {sectionTree.map(section => (
                         <RenderSection section={section} key={section.id} />
                     ))}

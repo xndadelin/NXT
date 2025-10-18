@@ -29,6 +29,7 @@ interface ParsedHeader {
     content: string[];
     quizIds: number[];
     children?: ParsedHeader[];
+    order: number;
 }
 
 interface TopicNode {
@@ -110,101 +111,110 @@ export default function AddTopicPage() {
 
   const parseMarkdown = (markdown: string, quizQuestions: { question: string, answer: string}[]) => {
     const lines = markdown.split('\n');
-
-    const structure: {
+      const structure: {
         id: string;
         level: number;
         title: string;
         parentId: string | null;
         content: string[]
         quizIds: number[]
-    }[] = [];
+        order: number
+      }[] = [];
 
-    let currentHeader: {
+      let currentHeader: {
         id: string;
         level: number;
         title: string;
         parentId: string | null;
         content: string[];
         quizIds: number[];
-    } | null = null;
+      } | null = null;
     let contentBuffer: string[] = [];
+    let headerOrder = 0;
+    let inCodeBlock = false;
 
     lines.forEach((line) => {
-        const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
+      const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
 
-        if (headerMatch) {
-            if (currentHeader) {
-                const headerIndex = structure.findIndex(h => h.id === currentHeader?.id);
-                if (headerIndex !== -1) {
-                    let start = 0;
-                    let end = contentBuffer.length - 1;
-                    
-                    while (start <= end && contentBuffer[start].trim() === '') start++;
-                    while (end >= start && contentBuffer[end].trim() === '') end--;
-                    
-                    structure[headerIndex].content = contentBuffer.slice(start, end + 1);
-                }
-                contentBuffer = []; 
-            }
+      if (line.trim().startsWith("```")) {
+        inCodeBlock = !inCodeBlock;
+        contentBuffer.push(line);
+        return;
+      }
 
-            const level = headerMatch[1].length;
-            const title = headerMatch[2].trim();
-            const id = crypto.randomUUID();
+      if (inCodeBlock) {
+        contentBuffer.push(line);
+        return;
+      }
 
-            let parentId = null;
-            for (let i = structure.length - 1; i >= 0; i--) {
-                if (structure[i].level < level) {
-                    parentId = structure[i].id;
-                    break;
-                }
-            }
-
-            const newHeader = {
-                id,
-                level,
-                title,
-                parentId,
-                content: [],
-                quizIds: [] as number[],
-            }
-
-            structure.push(newHeader);
-            currentHeader = newHeader;
-        } else if(line.trim().match(/^<(\d+)>$/)) {
-            const quizMatch = line.trim().match(/^<(\d+)>$/);
-            if(quizMatch && currentHeader) {
-                const quizIndex = parseInt(quizMatch[1], 10) - 1;
-                if(quizIndex >= 0 && quizIndex < quizQuestions.length) {
-                    currentHeader?.quizIds.push(quizIndex);
-                }
-            }
-        } else { 
-            contentBuffer.push(line);
+      if (headerMatch) {
+        if (currentHeader) {
+          const headerIndex = structure.findIndex(h => h.id === currentHeader?.id);
+          if (headerIndex !== -1) {
+            let start = 0;
+            let end = contentBuffer.length - 1;
+            while (start <= end && contentBuffer[start].trim() === '') start++;
+            while (end >= start && contentBuffer[end].trim() === '') end--;
+            structure[headerIndex].content = contentBuffer.slice(start, end + 1);
+          }
+          contentBuffer = [];
         }
+        const level = headerMatch[1].length;
+        const title = headerMatch[2].trim();
+        const id = crypto.randomUUID();
+        let parentId = null;
+        for (let i = structure.length - 1; i >= 0; i--) {
+          if (structure[i].level < level) {
+            parentId = structure[i].id;
+            break;
+          }
+        }
+        const newHeader = {
+          id,
+          level,
+          title,
+          parentId,
+          content: [],
+          quizIds: [] as number[],
+          order: headerOrder++
+        }
+        structure.push(newHeader);
+        currentHeader = newHeader;
+      } else if(line.trim().match(/^<(\d+)>$/)) {
+        const quizMatch = line.trim().match(/^<(\d+)>$/);
+        if(quizMatch && currentHeader) {
+          const quizIndex = parseInt(quizMatch[1], 10) - 1;
+          if(quizIndex >= 0 && quizIndex < quizQuestions.length) {
+            currentHeader?.quizIds.push(quizIndex);
+          }
+        }
+      } else { 
+        contentBuffer.push(line);
+      }
     });
 
     if (currentHeader) {
-        const headerIndex = structure.findIndex((h) => h.id === currentHeader?.id);
-        if (headerIndex !== -1) {
-            let start = 0;
-            let end = contentBuffer.length - 1;
-            
-            while (start <= end && contentBuffer[start].trim() === '') start++;
-            while (end >= start && contentBuffer[end].trim() === '') end--;
-            
-            structure[headerIndex].content = contentBuffer.slice(start, end + 1);
-        }
+      const headerIndex = structure.findIndex((h) => h.id === currentHeader?.id);
+      if (headerIndex !== -1) {
+        let start = 0;
+        let end = contentBuffer.length - 1;
+        while (start <= end && contentBuffer[start].trim() === '') start++;
+        while (end >= start && contentBuffer[end].trim() === '') end--;
+        structure[headerIndex].content = contentBuffer.slice(start, end + 1);
+      }
     }
-    
     return structure;
 }
 
   const generateFinalContent = (structure: ParsedHeader[], quizQuestions: { question: string, answer: string }[]) => {
-    const headerTree = structure.filter(header => !header.parentId)
+    const headerTree = structure
+      .filter(header => !header.parentId)
+      .sort((a, b) => a.order - b.order);
 
     const addChildren = (parent: ParsedHeader) : ParsedHeader => {
-        parent.children = structure.filter(header => header.parentId === parent.id);
+        parent.children = structure
+          .filter(header => header.parentId === parent.id)
+          .sort((a, b) => a.order - b.order);
         parent.children.forEach(addChildren)
         return parent;
     }
@@ -272,7 +282,7 @@ export default function AddTopicPage() {
       <label style={{ color: "var(--mantine-color-white-6)" }}>Content</label>
       <MDEditor
         value={form.values.content}
-        onChange={(value) => form.setFieldValue("content", value || "")}
+        onChange={(value) => form.setFieldValue("content", value || '')}
         style={{ background: "var(--mantine-color-dark-8)", marginTop: "0.5rem" }}
       />
       <Grid justify="space-between" align="center" my="md" p="sm">
