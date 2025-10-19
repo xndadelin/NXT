@@ -11,6 +11,7 @@ interface Contest {
     banner: string;
     participants: string[];
     has_ended?: boolean;
+    rules: string;
 }
 
 export default function useContest({ contestId } : { contestId: string }) {

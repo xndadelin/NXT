@@ -21,6 +21,7 @@ export default function ContestsPage() {
     if(loading || userLoading) return <Loading />
     if(error || userError) return <Error number={500} />
 
+
     return (
         <Container>
             <Group align="center" justify="space-between" my="md">
