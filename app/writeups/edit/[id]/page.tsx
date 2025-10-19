@@ -31,7 +31,7 @@ export interface Challenge {
 
 
 export default function EditWriteup() {
-    const { challenges } = useChallenges();
+    const { challenges } = useChallenges({method: 'public'});
     const { user, loading, error } = useUser();
     const { id } = useParams();
     const { writeup, loading: writeupLoading, error: writeupError} = useWriteup(id as string, 'edit');
