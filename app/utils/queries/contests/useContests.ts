@@ -27,31 +27,21 @@ export default function useContests() {
         const { data: user } = await supabase.auth.getUser();
         try {
             const { data, error } = await supabase.from('contests').select('id, title, description, start_time, end_time, created_at, banner, participants');
-            if (error) {
-                throw error;
-            } 
-            setContests(data || [])
+            if (error) throw error;
+
             const contestsWithParticipants = data?.map(contest => ({
                 ...contest,
                 participants: contest.participants ?? [],
-                isParticipating: user ? (contest.participants ?? []).includes(user?.user?.id) : false
+                isParticipating: user ? (contest.participants ?? []).includes(user?.user?.id) : false,
+                has_ended: new Date(contest.end_time) < new Date()
             }))
-            setContests(contestsWithParticipants || []);
-            if(user && contestsWithParticipants && contestsWithParticipants.length > 0) {
-                const participating = contestsWithParticipants.some(contest => contest.participants.includes(user?.user?.id))
+            setContests(contestsWithParticipants);
+
+            if(user && contestsWithParticipants.length > 0) {
+                const participating = contestsWithParticipants.some(contest => contest.isParticipating)
                 setUserIsParticipating(participating);
             } else {
                 setUserIsParticipating(false);
-            }
-            
-            if(data && data.length > 0) {
-                const now = new Date();
-                const ended = data.map(contest => {
-                    if(new Date(contest.end_time) < now) {
-                        return {...contest, has_ended: true};
-                    }
-                })
-                setContests(ended as Contest[]);
             }
 
         } catch (error) {

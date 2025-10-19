@@ -20,6 +20,7 @@ export default function ContestsPage() {
 
     if(loading || userLoading) return <Loading />
     if(error || userError) return <Error number={500} />
+    if(!contests) return <Error number={500} />
 
 
     return (
@@ -70,11 +71,13 @@ export default function ContestsPage() {
                                 alt={contest.title}
                                 height={140}
                                 radius="0"
-                                
                             />
                         )}
                         <Box p="lg">
                             <Title order={4} mb="xs" fw={700}>{contest.title}</Title>
+                            {contest.has_ended === true && (
+                                <Text size="xs" c="red" mb="xs">Contest has ended!</Text>
+                            )}
                             <Text c="dimmed" size="sm" mb="xs" lineClamp={2}>{contest.description}</Text>
                             <Text size="xs" c="gray">
                                 {new Date(contest.start_time).toUTCString()} - {new Date(contest.end_time).toUTCString()}
