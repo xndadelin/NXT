@@ -14,7 +14,6 @@ export default function ContestsPage() {
 
     const onHandleClickContest = (contestId: string) => {
 
-
     }
 
     return (
@@ -36,13 +35,11 @@ export default function ContestsPage() {
                         withBorder 
                         p={0}
                         onMouseEnter={e => {
-                            (e.currentTarget as unknown as HTMLDivElement).style.transform = 'scale(1.03)';
+                            (e.currentTarget as HTMLDivElement).style.transform = 'scale(1.03)';
                         }}
                         onMouseLeave={e => {
-                            (e.currentTarget as unknown as HTMLDivElement).style.transform = 'scale(1.00)';
+                            (e.currentTarget as HTMLDivElement).style.transform = 'scale(1.00)';
                         }}
-                        component={Link}
-                        href={`/contests/${contest.id}`}
                     >
                         {contest.banner && (
                             <Image 
