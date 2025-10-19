@@ -2,7 +2,7 @@ import { notifications } from "@mantine/notifications";
 import { createClient } from "../../supabase/client";
 import checkFlag from "@/app/utils/queries/challenges/checkFlag";
 
-export async function submitFlag(challengeId: string, flag: string) {
+export async function submitFlag(challengeId: string, flag: string, contest?: string) {
   const supabase = createClient();
   const { data } = await supabase.auth.getUser();
   if (!data) throw new Error("User not authenticated");
@@ -63,6 +63,7 @@ export async function submitFlag(challengeId: string, flag: string) {
         done: true,
         tries: 1,
         updated_at: new Date(),
+        contest: contest || null
       });
 
       if (insertError) {
@@ -75,6 +76,7 @@ export async function submitFlag(challengeId: string, flag: string) {
         done: false,
         tries: 1,
         updated_at: new Date(),
+        contest: contest || null
       });
 
       if (insertError) {
