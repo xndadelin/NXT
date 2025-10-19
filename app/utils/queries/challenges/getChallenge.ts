@@ -16,6 +16,7 @@ export interface Challenge {
   decay: number;
   max_points: number;
   hints?: string;
+  has_ended?: boolean;
 }
 
 export default function useChallenges(id: string, method: "public" | "contest", contest?: string) {
@@ -33,7 +34,7 @@ export default function useChallenges(id: string, method: "public" | "contest", 
         if (method === "contest" && contest) {
           const { data: contestData, error: contestError } = await supabase
             .from("contests")
-            .select("participants")
+            .select("participants, end_time")
             .eq("id", contest)
             .maybeSingle();
           if (!contestData?.participants?.includes(userId)) {
@@ -74,7 +75,8 @@ export default function useChallenges(id: string, method: "public" | "contest", 
             ...data,
             points: link.points,
             max_points: link.max_points,
-            decay: link.decay
+            decay: link.decay,
+            has_ended: new Date(contestData.end_time) < new Date()
           })
           return;
         }

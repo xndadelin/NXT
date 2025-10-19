@@ -59,7 +59,6 @@ export default function ChallengePage() {
   const { user } = useUser();
   const router = useRouter();
   const [flagValue, setFlagValue] = useState<string>("");
-  const [pressedHints, setPressedHints] = useState<boolean>(false);
   const { votes, userVote, loading: votesLoading, vote, votingError, fetchVotes } = useVoteChallenge(challengeId, user?.id)
 
   useEffect(() => {
@@ -220,13 +219,13 @@ export default function ChallengePage() {
                 }}
               >
                 <TextInput
-                  placeholder={done ? "Challenge completed" : "Flag"}
+                  placeholder={done ? challenge.has_ended === true ? "Contest has ended" : "Challenge completed": "Enter flag"}
                   variant="filled"
                   radius="md"
                   size="md"
                   rightSection={<IconFlag size={18} />}
                   style={{ flex: 1 }}
-                  disabled={done}
+                  disabled={done || challenge.has_ended === true}
                   value={flagValue}
                   onChange={(e) => setFlagValue(e.target.value)}
                   type="text"
