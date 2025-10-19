@@ -65,6 +65,7 @@ export default function CreateContest() {
         const challengeInserts = values.challenges.map((challengeId) => ({
             contest_id: contestId,
             challenge_id: challengeId,
+            max_points: challengesPoints[challengeId] || 500,
             points: challengesPoints[challengeId] || 500
         }))
         const { error: contestChallangesError } = await supabase.from('contests_challenges').insert(challengeInserts)
