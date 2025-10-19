@@ -3,27 +3,86 @@
 import Loading from "@/app/components/ui/Loading";
 import useUser from "@/app/utils/queries/user/useUser";
 import { Error } from "@/app/components/ui/Error";
-import { Container, TextInput, Title, Textarea, MultiSelect, Group, Text } from "@mantine/core";
+import { Container, TextInput, Title, Textarea, MultiSelect, Group, Text, NumberInput, Button } from "@mantine/core";
 import useChallenges from "@/app/utils/queries/challenges/getChallenges";
 import { useState } from "react";
 import { useForm } from "@mantine/form";
 import { DateTimePicker } from "@mantine/dates"
 import '@mantine/dates/styles.css';
+import { createClient } from "@/app/utils/supabase/client";
+import { notifications } from "@mantine/notifications";
+import { useRouter } from "next/navigation";
 
 export default function CreateContest() {
     const {user, loading, error} = useUser();
     const { challenges } = useChallenges({ method: "private"});
-    const [submitting, setSubmitting] = useState<boolean>(false);
+    const [challengesPoints, setChallengesPoints] = useState<Record<string, number>>({})
+    const router = useRouter();
 
     const form = useForm({
         initialValues: {
             title: "",
             description: "",
-            start_date: "",
-            end_date: "",
+            start_date: null as Date | null,
+            end_date: null as Date | null,
             challenges: [] as string[],
+            rules: '',
+            key: crypto.randomUUID()
         }
     })
+
+    const handleSubmit = async (values: typeof form.values) => {
+        const supabase = createClient();
+        const { data: contest, error: contestError } = await supabase.from('contests').insert([{
+            title: values.title,
+            description: values.description,
+            start_time: values.start_date,
+            end_time: values.end_date,
+            created_by: user?.id,
+            key: values.key,
+            rules: values.rules
+        }]).select().single();
+        if(contestError) {
+            notifications.show({
+                title: 'Error',
+                message: contestError.message,
+                color: 'red'
+            })
+            return ;
+        }
+        const contestId = contest?.id
+        if(!contestId) {
+            notifications.show({
+                title: 'Error',
+                message: 'Contest not created, smh',
+                color: 'red'
+            })
+            return ;
+        }
+        const challengeInserts = values.challenges.map((challengeId) => ({
+            contest_id: contestId,
+            challenge_id: challengeId,
+            points: challengesPoints[challengeId] || 500
+        }))
+        const { error: contestChallangesError } = await supabase.from('contests_challenges').insert(challengeInserts)
+        if(contestChallangesError) {
+            notifications.show({
+                title: 'Error',
+                message: contestChallangesError.message,
+                color: 'red'
+            })
+            return;
+        }
+
+        notifications.show({
+            title: 'Success',
+            message: 'Contest created successfully!',
+            color: 'green'
+        })
+
+        router.push('/contests')
+
+    }
 
     if(loading) return <Loading />
     if(error) return <Error number={500} />
@@ -33,7 +92,10 @@ export default function CreateContest() {
     return (
        <Container>
         <Title fw={700} fs={"lg"} my="lg">Create contest</Title>
-        <form>
+        <Text c="dimmed" my="sm">
+            The key is {form.values.key}. This what users will use to join the contest.
+        </Text>
+        <form onSubmit={form.onSubmit(handleSubmit)}>
             <TextInput
                 label="Title"
                 required
@@ -45,6 +107,14 @@ export default function CreateContest() {
                 {...form.getInputProps('description')}
                 required
                 mb="md"
+                rows={7}
+            />
+            <Textarea
+                label="Rules"
+                {...form.getInputProps('rules')}
+                required
+                mb="md"
+                rows={4}
             />
             <Text c="dimmed" fz="sm">
                 The start and end date must be in UTC timezone!
@@ -73,6 +143,33 @@ export default function CreateContest() {
 
                 mb="md"
             />
+
+            {form.values.challenges.length > 0 && (
+                <div>
+                    <Title order={4} mb="sm">Set challenge points</Title>
+                    {form.values.challenges.map((challengeId) => {
+                        const challenge = challenges.find((c) => c.id === challengeId)
+                        return (
+                            <NumberInput
+                                key={challengeId}
+                                label={challenge?.title || challengeId}
+                                value={challengesPoints[challengeId] || ''}
+                                onChange={(value) => {
+                                    setChallengesPoints((prev) => ({
+                                        ...prev,
+                                        [challengeId]: typeof value === 'number' && !isNaN(value) ? value : 0
+                                    }))
+                                }}
+                            />
+                        )
+                    })}
+                </div>
+            )}
+
+            <Button type="submit" mt="md">
+                Create contest
+            </Button>
+
         </form>
        </Container>
     )
