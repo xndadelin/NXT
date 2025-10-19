@@ -12,6 +12,13 @@ interface Contest {
     participants: string[];
     has_ended?: boolean;
     rules: string;
+    challenges?: {
+        challenge_id: string;
+        title: string;
+        difficulty: string;
+        category: string;
+        points: number;
+    } []
 }
 
 export default function useContest({ contestId } : { contestId: string }) {
@@ -34,6 +41,31 @@ export default function useContest({ contestId } : { contestId: string }) {
         } else {
             const now = new Date();
             const has_ended = new Date(data.end_time) < now;
+            const has_started = new Date(data.start_time) < now
+            if(has_started) {
+                const { data: challengesData, error: challengesError } = await supabase.from('contests_challenges').select('challenge_id').eq('contest_id', contestId);
+                if (challengesError) {
+                    setError(challengesError.message);
+                    setContest(null);
+                    setLoading(false);
+                    return;
+                }
+                const challengeIds = challengesData?.map(c => c.challenge_id) || [];
+                const { data: challengesDetails, error: challengesDetailsError } = await supabase.from('challenges').select('id, title, difficulty, category, points').in('id', challengeIds)
+                if (challengesDetailsError) {
+                    setError(challengesDetailsError.message);
+                    setContest(null);
+                    setLoading(false);
+                    return ;
+                }
+                data.challenges = challengesDetails.map(challenge => ({
+                    challenge_id: challenge.id,
+                    title: challenge.title,
+                    difficulty: challenge.difficulty,
+                    category: challenge.category,
+                    points: challenge.points,
+                }))
+            }
             setContest({ ...data, has_ended });
             setError(null);
         }
