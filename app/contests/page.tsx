@@ -36,7 +36,7 @@ export default function ContestsPage() {
                     <Card 
                         key={contest.id} 
                         shadow="sm" 
-                        style={{ cursor: 'pointer', transition: 'transform 0.3s cubic-bezier(.4,2,.3,1)' }}
+                        style={{ cursor: 'pointer', transition: 'transform 0.3s cubic-bezier(.4,2,.3,1)', marginBottom: '20px', width: '100%' }}
                         radius="md" 
                         withBorder 
                         p={0}

@@ -13,10 +13,18 @@ import { createClient } from "@/app/utils/supabase/client";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
 
+interface ChallengeData {
+    [key: string]: {
+        points: number;
+        max_points: number;
+        decay: number;
+    };
+}
+
 export default function CreateContest() {
     const {user, loading, error} = useUser();
     const { challenges } = useChallenges({ method: "private"});
-    const [challengesPoints, setChallengesPoints] = useState<Record<string, number>>({})
+    const [challengesData, setChallengesData] = useState<ChallengeData>({});
     const router = useRouter();
 
     const form = useForm({
@@ -65,8 +73,9 @@ export default function CreateContest() {
         const challengeInserts = values.challenges.map((challengeId) => ({
             contest_id: contestId,
             challenge_id: challengeId,
-            max_points: challengesPoints[challengeId] || 500,
-            points: challengesPoints[challengeId] || 500
+            max_points: challengesData[challengeId]?.max_points || 500,
+            points: challengesData[challengeId]?.points || 500,
+            decay: challengesData[challengeId]?.decay || 0
         }))
         const { error: contestChallangesError } = await supabase.from('contests_challenges').insert(challengeInserts)
         if(contestChallangesError) {
@@ -159,19 +168,47 @@ export default function CreateContest() {
                     <Title order={4} mb="sm">Set challenge points</Title>
                     {form.values.challenges.map((challengeId) => {
                         const challenge = challenges.find((c) => c.id === challengeId)
+                        const data = challengesData[challengeId] || {
+                            points: 0,
+                            max_points: 0,
+                            decay: 0,
+                        }
                         return (
+                          <div key={challengeId} style={{ marginBottom: '16px' }}>
                             <NumberInput
-                                key={challengeId}
-                                label={challenge?.title || challengeId}
-                                value={challengesPoints[challengeId] || ''}
-                                onChange={(value) => {
-                                    setChallengesPoints((prev) => ({
-                                        ...prev,
-                                        [challengeId]: typeof value === 'number' && !isNaN(value) ? value : 0
-                                    }))
-                                }}
+                              key={challengeId}
+                              label={challenge?.title || challengeId}
+                              value={data.points}
+                              onChange={(value) => {
+                                setChallengesData((prev) => ({
+                                  ...prev,
+                                  [challengeId]: {
+                                    ...data,
+                                    points:
+                                      typeof value === "number"
+                                        ? value
+                                        : data.points,
+                                  },
+                                }));
+                              }}
+                              min={50}
                             />
-                        )
+                            <NumberInput
+                              label="Decay (0 to 1)"
+                              value={data.decay}
+                              onChange={(value) => {
+                                setChallengesData((prev) => ({
+                                  ...prev,
+                                  [challengeId]: {
+                                    ...data,
+                                    decay:
+                                      typeof value === "number" ? value : 0,
+                                  },
+                                }));
+                              }}
+                            />
+                          </div>
+                        );
                     })}
                 </div>
             )}
@@ -181,6 +218,7 @@ export default function CreateContest() {
             </Button>
 
         </form>
+        <div style={{ height: '200px' }}></div>
        </Container>
     )
 }
