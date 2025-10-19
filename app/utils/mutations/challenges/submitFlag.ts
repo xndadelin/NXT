@@ -63,7 +63,7 @@ export async function submitFlag(challengeId: string, flag: string, contest?: st
         done: true,
         tries: 1,
         updated_at: new Date(),
-        contest: contest || null
+        contest_id: contest || null
       });
 
       if (insertError) {
@@ -76,7 +76,7 @@ export async function submitFlag(challengeId: string, flag: string, contest?: st
         done: false,
         tries: 1,
         updated_at: new Date(),
-        contest: contest || null
+        contest_id: contest || null
       });
 
       if (insertError) {
@@ -85,32 +85,8 @@ export async function submitFlag(challengeId: string, flag: string, contest?: st
     }
   }
   if (isCorrect) {
-    const { error: userError, data: userData } = await supabase
-      .from("users")
-      .select("points")
-      .eq("id", id)
-      .single();
-    const { error: challengeError, data: challengeData } = await supabase
-      .from("challenges")
-      .select("points")
-      .eq("id", challengeId)
-      .single();
-    if (challengeError) {
-      throw new Error("Failed to fetch challenge points");
-    }
-    if (userError) {
-      throw new Error("Failed to fetch user points");
-    }
-    const totalPoints = (userData?.points || 0) + (challengeData?.points || 0);
-    const { error: updateUserError } = await supabase
-      .from("users")
-      .update({ points: totalPoints })
-      .eq("id", id);
-    if (updateUserError) {
-      throw new Error("Failed to update user points");
-    }
     if(isCorrect && (!existentSubmission || !existentSubmission.done)) {
-      const { data: challenge, error: challengeFetchError } = await supabase.from('challenges').select('solves').eq('id', challengeId).single();
+      const { data: challenge, error: challengeFetchError } = await supabase.from('challenges').select('solves,decay,max_points,points').eq('id', challengeId).single();
       if(challengeFetchError) {
         throw new Error('Failed to fetch challenge solves!');
       }
@@ -125,6 +101,34 @@ export async function submitFlag(challengeId: string, flag: string, contest?: st
         throw new Error('failed to increment solves!')
       }
 
+      const newPoints = Math.max(50, Math.floor(challenge.max_points/(1 + challenge.decay * (Math.log(1 + newSolves)))))
+
+      const { error: pointsError } = await supabase.from('challenges').update({
+        points: newPoints
+      }).eq('id', challengeId);
+
+      if(pointsError) {
+        throw new Error('failed to update challenge points!')
+      }
+
+    const { error: userError, data: userData } = await supabase
+      .from("users")
+      .select("points")
+      .eq("id", id)
+      .single();
+
+    if (userError) {
+      throw new Error("Failed to fetch user points");
+    }
+    const totalPoints = (userData?.points || 0) + (newPoints || 0);
+    const { error: updateUserError } = await supabase
+      .from("users")
+      .update({ points: totalPoints })
+      .eq("id", id);
+
+    if (updateUserError) {
+      throw new Error("Failed to update user points");
+    }
     }
   }
   

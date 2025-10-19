@@ -13,10 +13,12 @@ interface Challenge {
   id?: string;
   hints?: string;
   decay: number;
+  max_points: number;
 }
 
 export default async function createChallenge(challenge: Challenge) {
   const supabase = await createClient();
+  challenge.max_points = challenge.points;
 
   const { data, error } = await supabase
     .from("challenges")

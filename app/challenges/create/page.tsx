@@ -34,6 +34,7 @@ function CreateChallenge() {
     case_insensitive: boolean;
     hints: string;
     decay: number;
+    max_points: number;
   }>({
     initialValues: {
       title: "",
@@ -46,8 +47,10 @@ function CreateChallenge() {
       mitre: "",
       case_insensitive: false,
       hints: "",
-      decay: 0.5
+      decay: 0.5,
+      max_points: 500
     },
+
 
     validate: {
       title: (value) => (!value ? "Title is required" : null),
