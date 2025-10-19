@@ -33,6 +33,7 @@ function CreateChallenge() {
     mitre: string;
     case_insensitive: boolean;
     hints: string;
+    decay: number;
   }>({
     initialValues: {
       title: "",
@@ -41,10 +42,11 @@ function CreateChallenge() {
       category: "",
       flag: "",
       resource: "",
-      points: 0,
+      points: 500,
       mitre: "",
       case_insensitive: false,
       hints: "",
+      decay: 0.5
     },
 
     validate: {
@@ -188,6 +190,13 @@ function CreateChallenge() {
           value={form.values.points}
           onChange={(e) => form.setFieldValue("points", Number(e) || 500)}
           mt={"md"}
+        />
+        <NumberInput
+          label='Decay factor'
+          placeholder='Decay factor for scoring (0 to 1)'
+          size="md"
+          {...form.getInputProps('decay')}
+          mt="md"
         />
         <Textarea
           label="Hints"

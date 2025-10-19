@@ -12,6 +12,7 @@ interface Challenge {
   case_insensitive?: boolean;
   id?: string;
   hints?: string;
+  decay: number;
 }
 
 export default async function createChallenge(challenge: Challenge) {
