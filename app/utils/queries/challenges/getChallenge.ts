@@ -14,6 +14,8 @@ export interface Challenge {
   resource: string;
   mitre: string;
   hints: string;
+  decay: number;
+  max_points: number;
 }
 
 export default function useChallenges(id: string) {
@@ -28,7 +30,7 @@ export default function useChallenges(id: string) {
         const { data, error } = await supabase
           .from("challenges")
           .select(
-            "id, title, difficulty, category, points, created_at, description, resource, mitre, hints"
+            "id, title, difficulty, category, points, created_at, description, resource, mitre, hint, decay, max_points, hints"
           )
           .eq("id", id)
           .maybeSingle();

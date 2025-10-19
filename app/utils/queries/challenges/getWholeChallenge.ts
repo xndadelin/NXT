@@ -16,6 +16,8 @@ export interface Challenge {
   flag: string;
   case_insensitive: boolean;
   hints: string;
+  decay: number;
+  max_points: number;
 }
 
 export default function useGetWholeChallenge(id: string) {

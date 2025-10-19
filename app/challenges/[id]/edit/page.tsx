@@ -43,6 +43,8 @@ function EditChallenge() {
     case_insensitive: boolean;
     hints: string;
     id: string;
+    decay: number;
+    max_points: number;
   }>({
     initialValues: {
       title: challenge?.title || "",
@@ -56,6 +58,8 @@ function EditChallenge() {
       case_insensitive: challenge?.case_insensitive || false,
       id: challenge?.id || "",
       hints: challenge?.hints || "",
+      decay: challenge?.decay || 0.5,
+      max_points: challenge?.max_points || 500
     },
 
     validate: {
