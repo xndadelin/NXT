@@ -22,8 +22,6 @@ export default function useContests() {
     const [error, setError] = useState<string | null>(null);
     const [userIsParticipating, setUserIsParticipating] = useState<boolean>(false);
 
-
-
     async function fetchContests() {
         setLoading(true);
         const { data: user } = await supabase.auth.getUser();
@@ -96,7 +94,6 @@ export default function useContests() {
         }
         return false;
     }
-    
 
     useEffect(() => {
         fetchContests();
