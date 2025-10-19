@@ -27,7 +27,8 @@ export default function CreateContest() {
             end_date: null as Date | null,
             challenges: [] as string[],
             rules: '',
-            key: crypto.randomUUID()
+            key: crypto.randomUUID(),
+            banner: ''
         }
     })
 
@@ -40,7 +41,8 @@ export default function CreateContest() {
             end_time: values.end_date,
             created_by: user?.id,
             key: values.key,
-            rules: values.rules
+            rules: values.rules,
+            banner: values.banner
         }]).select().single();
         if(contestError) {
             notifications.show({
@@ -115,6 +117,12 @@ export default function CreateContest() {
                 required
                 mb="md"
                 rows={4}
+            />
+            <TextInput
+                label="Banner URL"
+                {...form.getInputProps('banner')}
+                required
+                mb="md"
             />
             <Text c="dimmed" fz="sm">
                 The start and end date must be in UTC timezone!
