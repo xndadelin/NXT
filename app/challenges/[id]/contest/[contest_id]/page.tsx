@@ -52,9 +52,9 @@ import { useVoteChallenge } from "@/app/utils/mutations/challenges/useChallengeV
 import MDEditor from "@uiw/react-md-editor";
 
 export default function ChallengePage() {
-  const { id } = useParams();
+  const { id, contest_id } = useParams();
   const challengeId = typeof id === "string" ? id : String(id ?? "");
-  const { challenge, loading, error } = useChallenge(challengeId, 'public');
+  const { challenge, loading, error } = useChallenge(challengeId, contest_id ? 'contest' : 'public', contest_id as string);
   const [done, setDone] = useState<boolean>(false);
   const { user } = useUser();
   const router = useRouter();

@@ -12,9 +12,12 @@ import {
   Text,
   Divider,
   SimpleGrid,
+  Badge,
+  Group
 } from "@mantine/core";
 import { Tabs } from "@mantine/core";
 import MDEditor from "@uiw/react-md-editor";
+import Link from "next/link";
 
 interface Challenge {
   challenge_id: string;
@@ -22,6 +25,21 @@ interface Challenge {
   difficulty: string;
   category: string;
   points: number;
+}
+
+function getDifficultyColor(difficulty: string) {
+    switch(difficulty.toLowerCase()) {
+        case 'easy':
+            return 'green';
+        case 'medium':
+            return 'yellow';
+        case 'hard':
+            return 'red'
+        case 'insane':
+            return 'purple'
+        default:
+            return 'gray'
+    }
 }
 
 export default function ContestPage() {
@@ -80,11 +98,21 @@ export default function ContestPage() {
                     shadow="sm"
                     radius="sm"
                     withBorder
+                    style={{
+                        transition: 'transform 0.3s cubic-bezier(.4,2,.3,1)',
+                        cursor: 'pointer'
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.03)')}
+                    onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1.00)')}
+                    component={Link}
+                    href={`/challenges/${challenge.challenge_id}/contest/${params.id}`}
                   >
-                    <Title order={5}>{challenge.title}</Title>
-                    <Text size="sm" mt="xs">
-                      Difficulty: {challenge.difficulty}
-                    </Text>
+                    <Group justify="space-between" align="center" mb="xs">
+                        <Title order={5}>{challenge.title}</Title>
+                        <Badge color={getDifficultyColor(challenge.difficulty)} size="sm">
+                            {challenge.difficulty}
+                        </Badge>
+                    </Group>
                     <Text size="sm" mt="xs">
                       Category: {challenge.category}
                     </Text>

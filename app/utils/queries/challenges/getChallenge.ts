@@ -18,7 +18,7 @@ export interface Challenge {
   max_points: number;
 }
 
-export default function useChallenges(id: string) {
+export default function useChallenges(id: string, method: "public" | "contest", contest?: string) {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,12 +27,56 @@ export default function useChallenges(id: string) {
     async function fetchChallenge() {
       try {
         const supabase = createClient();
+        const { data: user } = await supabase.auth.getUser();
+        const userId = user?.user?.id
+
+        if (method === "contest" && contest) {
+          const { data: contestData, error: contestError } = await supabase
+            .from("contests")
+            .select("participants")
+            .eq("id", contest)
+            .maybeSingle();
+          if (!contestData?.participants?.includes(userId)) {
+            setChallenge(null);
+            setLoading(false);
+            return;
+          }
+
+          const { data: link, error: linkError } = await supabase
+            .from("contests_challenges")
+            .select("challenge_id")
+            .eq("challenge_id", id)
+            .eq("contest_id", contest)
+            .maybeSingle();
+
+          if (linkError || !link) {
+            setChallenge(null);
+            setLoading(false);
+            return;
+          }
+
+          const { data, error } = await supabase
+            .from("challenges")
+            .select(
+              "id, title, difficulty, category, points, created_at, description, resource, mitre, decay, max_points, hints"
+            )
+            .eq("id", id)
+            .maybeSingle();
+          if (error) {
+            throw error;
+          }
+
+          setChallenge(data || null);
+          return;
+        }
+
         const { data, error } = await supabase
           .from("challenges")
           .select(
             "id, title, difficulty, category, points, created_at, description, resource, mitre, decay, max_points, hints"
           )
           .eq("id", id)
+          .eq("private", method === "public" ? false : true)
           .maybeSingle();
         if (error) {
           throw error;
