@@ -315,48 +315,6 @@ export default function ChallengePage() {
               </List.Item>
             </List>
           </Card>
-          <Card shadow="sm" p="lg" mb="md" radius={"md"} withBorder>
-            <Title order={4} mb="md" fw={600}>
-              Need help?
-            </Title>
-            <Text size="sm" c="dimmed" mb="md">
-              Stuck on this challenge?
-            </Text>
-            <Button
-              variant="light"
-              fullWidth
-              mb="xs"
-              leftSection={<IconBulb size={14} />}
-              onClick={() => setPressedHints(!pressedHints)}
-            >
-              View hints
-            </Button>
-            {pressedHints && (
-              <Text size="sm" c="dimmed" mb="md">
-                {!challenge?.hints
-                  ? "No hints available for this challenge."
-                  : challenge?.hints}
-              </Text>
-            )}
-            <Button
-              variant="light"
-              fullWidth
-              leftSection={<IconMessageCircle size={14} />}
-              mb="xs"
-              component={Link}
-              href={"/challenges"}
-            >
-              Try another challenge
-            </Button>
-            <Button
-              variant="light"
-              fullWidth
-              mb="xs"
-              leftSection={<IconBook size={14} />}
-            >
-              Writeups
-            </Button>
-          </Card>
           <Card shadow="sm" p="lg" radius={"md"} withBorder>
             <Group align="center" gap={8} mt="md" justify="center">
               <Button
