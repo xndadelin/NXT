@@ -15,7 +15,7 @@ export async function submitFlag(challengeId: string, flag: string, contest?: st
 
   const { data: existentSubmission, error: errorFetch } = await supabase
     .from("submissions")
-    .select("tries")
+    .select("tries, done")
     .eq("user_id", id)
     .eq("challenge", challengeId)
     .maybeSingle();
@@ -109,6 +109,24 @@ export async function submitFlag(challengeId: string, flag: string, contest?: st
     if (updateUserError) {
       throw new Error("Failed to update user points");
     }
+    if(isCorrect && (!existentSubmission || !existentSubmission.done)) {
+      const { data: challenge, error: challengeFetchError } = await supabase.from('challenges').select('solves').eq('id', challengeId).single();
+      if(challengeFetchError) {
+        throw new Error('Failed to fetch challenge solves!');
+      }
+
+      const newSolves = (challenge?.solves || 0) + 1;
+
+      const { error: solvesError } = await supabase.from('challenges').update({ 
+        solves: newSolves
+      }).eq('id', challengeId);
+
+      if(solvesError) {
+        throw new Error('failed to increment solves!')
+      }
+
+    }
   }
+  
   return isCorrect;
 }
