@@ -42,7 +42,8 @@ export default function CreateContest() {
             created_by: user?.id,
             key: values.key,
             rules: values.rules,
-            banner: values.banner
+            banner: values.banner,
+            participants: [user?.id]
         }]).select().single();
         if(contestError) {
             notifications.show({

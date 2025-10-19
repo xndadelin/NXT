@@ -1,20 +1,25 @@
 'use client'
 
-import { Container, Group, Text, Button, Title, Grid, Card, Image, Box} from "@mantine/core";
+import { Container, Group, Text, Button, Title, Grid, Card, Image, Box, Modal, TextInput} from "@mantine/core";
 import Link from "next/link";
 import useContests from "../utils/queries/contests/useContests";
 import useUser from "../utils/queries/user/useUser";
 import Loading from "../components/ui/Loading";
+import { notifications } from "@mantine/notifications";
+import { useRouter } from "next/navigation";
+import { Error } from "../components/ui/Error";
+import { useDisclosure } from "@mantine/hooks";
+import { useState } from "react";
 
 export default function ContestsPage() {
-    const {contests, loading, error} = useContests();
+    const {contests, loading, error, userIsParticipating, verifyKey} = useContests();
     const {user, loading: userLoading, error: userError} = useUser();
+    const router = useRouter(); 
+    const [opened, { open, close }] = useDisclosure(false);
+    const [openedContestId, setOpenedContestId] = useState<string | null>(null)
 
     if(loading || userLoading) return <Loading />
-
-    const onHandleClickContest = (contestId: string) => {
-
-    }
+    if(error || userError) return <Error number={500} />
 
     return (
         <Container>
@@ -40,6 +45,23 @@ export default function ContestsPage() {
                         onMouseLeave={e => {
                             (e.currentTarget as HTMLDivElement).style.transform = 'scale(1.00)';
                         }}
+                        onClick={() => {
+                            if(!user) {
+                                notifications.show({
+                                    title: 'Unauthorized',
+                                    message: 'You must be logged in to view/join a contest.',
+                                    color: 'red'
+                                });
+                            }
+                            else {
+                                if(contest.participants && contest.participants.includes(user.id)) {
+                                    router.push(`/contests/${contest.id}`)
+                                } else {
+                                    setOpenedContestId(contest.id)
+                                    open();
+                                }
+                            }
+                        }}
                     >
                         {contest.banner && (
                             <Image 
@@ -60,6 +82,42 @@ export default function ContestsPage() {
                     </Card>
                 ))}
             </Grid>
+            <Modal opened={opened} onClose={close} title="Join contest">
+                <Text mb="md">
+                    Hello! You must enter a key to join/view this contest!
+                </Text>
+                <TextInput
+                    placeholder="Enter contest key"
+                    label="Contest key"
+                    required
+                    mt="sm"
+                />
+                <Button
+                    mt="md"
+                    fullWidth
+                    onClick={async () => {
+                        const isValid = await verifyKey(openedContestId as string, (document.querySelector('input[placeholder="Enter contest key"]') as HTMLInputElement).value)
+                        if(isValid) {
+                            close();
+                            notifications.show({
+                                title: 'Success',
+                                message: 'You have joined the contest successfully!',
+                                color: 'green'
+                            })
+                            router.push('/contests/' + openedContestId)
+                        } else {
+                            notifications.show({
+                                title: 'Error',
+                                message: 'Invalid contest key. Please try again.',
+                                color: 'red'
+                            })
+                        }
+                    }}
+                    disabled={!openedContestId}
+                >
+                    Join contest
+                </Button>
+            </Modal>
         </Container>
     )
 }
