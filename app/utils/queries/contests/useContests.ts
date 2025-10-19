@@ -8,7 +8,7 @@ interface Contest {
     start_time: string;
     end_time: string;
     created_at: string;
-
+    banner: string;
 }
 
 export default function useContests() {
