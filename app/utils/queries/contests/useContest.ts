@@ -43,7 +43,7 @@ export default function useContest({ contestId } : { contestId: string }) {
             const has_ended = new Date(data.end_time) < now;
             const has_started = new Date(data.start_time) < now
             if(has_started) {
-                const { data: challengesData, error: challengesError } = await supabase.from('contests_challenges').select('challenge_id').eq('contest_id', contestId);
+                const { data: challengesData, error: challengesError } = await supabase.from('contests_challenges').select('challenge_id, points').eq('contest_id', contestId);
                 if (challengesError) {
                     setError(challengesError.message);
                     setContest(null);
@@ -51,7 +51,7 @@ export default function useContest({ contestId } : { contestId: string }) {
                     return;
                 }
                 const challengeIds = challengesData?.map(c => c.challenge_id) || [];
-                const { data: challengesDetails, error: challengesDetailsError } = await supabase.from('challenges').select('id, title, difficulty, category, points').in('id', challengeIds)
+                const { data: challengesDetails, error: challengesDetailsError } = await supabase.from('challenges').select('id, title, difficulty, category').in('id', challengeIds)
                 if (challengesDetailsError) {
                     setError(challengesDetailsError.message);
                     setContest(null);
@@ -63,7 +63,7 @@ export default function useContest({ contestId } : { contestId: string }) {
                     title: challenge.title,
                     difficulty: challenge.difficulty,
                     category: challenge.category,
-                    points: challenge.points,
+                    points: challengesData.find(c => c.challenge_id === challenge.id)?.points || 0,
                 }))
             }
             setContest({ ...data, has_ended });
