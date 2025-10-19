@@ -28,7 +28,7 @@ export interface Challenge {
 
 
 export default function WriteupFormPage() {
-    const { challenges } = useChallenges();
+    const { challenges } = useChallenges({method: 'public'});
     const { user, loading, error } = useUser();
 
     const form = useForm({
