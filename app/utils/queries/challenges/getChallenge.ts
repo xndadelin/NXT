@@ -44,7 +44,7 @@ export default function useChallenges(id: string, method: "public" | "contest", 
 
           const { data: link, error: linkError } = await supabase
             .from("contests_challenges")
-            .select("challenge_id")
+            .select("challenge_id, points, max_points, decay")
             .eq("challenge_id", id)
             .eq("contest_id", contest)
             .maybeSingle();
@@ -58,15 +58,24 @@ export default function useChallenges(id: string, method: "public" | "contest", 
           const { data, error } = await supabase
             .from("challenges")
             .select(
-              "id, title, difficulty, category, points, created_at, description, resource, mitre, decay, max_points, hints"
+              "id, title, difficulty, category, created_at, description, resource, mitre, hints"
             )
             .eq("id", id)
             .maybeSingle();
           if (error) {
             throw error;
           }
-
-          setChallenge(data || null);
+          if(!data) {
+            setChallenge(null);
+            setLoading(false);
+            return;
+          }
+          setChallenge({
+            ...data,
+            points: link.points,
+            max_points: link.max_points,
+            decay: link.decay
+          })
           return;
         }
 
@@ -91,7 +100,7 @@ export default function useChallenges(id: string, method: "public" | "contest", 
     }
 
     fetchChallenge();
-  }, [id]);
+  }, [id, method, contest]);
 
   return { challenge, loading, error };
 }

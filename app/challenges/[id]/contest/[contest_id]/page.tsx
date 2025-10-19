@@ -42,7 +42,7 @@ import {
 } from "@tabler/icons-react";
 import { FormEvent, useEffect, useState } from "react";
 import checkIfDone from "@/app/utils/queries/challenges/checkIfDone";
-import { submitFlag } from "@/app/utils/mutations/challenges/submitFlag";
+import { submitFlag } from "@/app/utils/mutations/challenges/submitFlagContest";
 import { notifications } from "@mantine/notifications";
 import useUser from "@/app/utils/queries/user/useUser";
 import { useRouter } from "next/navigation";
