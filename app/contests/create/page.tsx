@@ -3,7 +3,7 @@
 import Loading from "@/app/components/ui/Loading";
 import useUser from "@/app/utils/queries/user/useUser";
 import { Error } from "@/app/components/ui/Error";
-import { Container, TextInput, Title, Textarea, MultiSelect, Group } from "@mantine/core";
+import { Container, TextInput, Title, Textarea, MultiSelect, Group, Text } from "@mantine/core";
 import useChallenges from "@/app/utils/queries/challenges/getChallenges";
 import { useState } from "react";
 import { useForm } from "@mantine/form";
@@ -46,6 +46,9 @@ export default function CreateContest() {
                 required
                 mb="md"
             />
+            <Text c="dimmed" fz="sm">
+                The start and end date must be in UTC timezone!
+            </Text>
             <Group grow >
                 <DateTimePicker
                     label="Start date"

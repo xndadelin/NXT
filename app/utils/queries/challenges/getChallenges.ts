@@ -22,7 +22,11 @@ export default function useChallenges({ method }: { method: "public" | "private"
     async function fetchChallenges() {
       try {
         const supabase = createClient();
-        const { data, error } = await supabase.from("challenges").select("*").eq("private", method === "private");
+        let query = supabase.from('challenges').select('*');
+        if(method === 'public') {
+          query = query.eq('private', false);
+        }
+        const { data, error } = await query;
 
         if (error) {
           throw error;
