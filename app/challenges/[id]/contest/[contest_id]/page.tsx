@@ -93,7 +93,7 @@ export default function ChallengePage() {
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const isCorrect = await submitFlag(challengeId, flagValue);
+    const isCorrect = await submitFlag(challengeId, flagValue, contest_id as string);
     if (isCorrect) {
       setDone(true);
       notifications.show({
