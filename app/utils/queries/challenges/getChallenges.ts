@@ -11,6 +11,8 @@ export interface Challenge {
   points: number;
   created_at: string;
   accuracy?: number;
+  downvotes?: number;
+  upvotes?: number;
 }
 
 export default function useChallenges({ method }: { method: "public" | "private" }) {
@@ -60,6 +62,36 @@ export default function useChallenges({ method }: { method: "public" | "private"
         })
 
         setChallenges(challengesWithStats);
+
+        const { data: votesData, error: votesError } = await supabase.from('challenge_votes').select('challenge_id, vote_type');
+        if(votesError) throw votesError;
+
+        const votesMap: Record<string, { upvotes: number; downvotes: number }> = {};
+        votesData?.forEach((votes) => {
+          if(!votesMap[votes.challenge_id]) {
+            votesMap[votes.challenge_id] = {
+              upvotes: 0,
+              downvotes: 0
+            }
+          }
+          if(votes.vote_type === -1) {
+            votesMap[votes.challenge_id].downvotes += 1;
+          } else {
+            votesMap[votes.challenge_id].upvotes += 1;
+          }
+        })
+
+        const challengesWithVotes = challengesWithStats.map((challenge) => {
+          const votes = votesMap[challenge.id] || { upvotes: 0, downvotes: 0};
+          return {
+            ...challenge,
+            upvotes: votes.upvotes,
+            downvotes: votes.downvotes
+          }
+        })
+
+        setChallenges(challengesWithVotes)
+
         const { data: userData, error: userError } =
           await supabase.auth.getUser();
         if (userError) {
