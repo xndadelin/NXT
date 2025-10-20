@@ -9,6 +9,7 @@ import {
   Group,
   Pagination,
   Box,
+  TextInput,
 } from "@mantine/core";
 import { useLeaderboard } from "../utils/queries/leaderboard/getLeaderboard";
 import Loading from "../components/ui/Loading";
@@ -22,14 +23,19 @@ function Leaderboard() {
   const [activePage, setActivePage] = useState<number>(1);
   const usersPerPage = 10;
   const { recent, loading: recentLoading } = useRecentActivity();
+  const [searchQuery, setSearchQuery] = useState<string>("")
+
+  const filteredLeaderboard = leaderboard.filter(user =>
+     user.username.toLowerCase().includes(searchQuery.toLowerCase())
+   )
 
   if (loading) return <Loading />;
   if (error) return <Error number={500} />;
 
-  const totalPages = Math.max(1, Math.ceil(leaderboard.length / usersPerPage));
+  const totalPages = Math.max(1, Math.ceil(filteredLeaderboard.length / usersPerPage));
   const currentPage = activePage > totalPages ? totalPages : activePage;
 
-  const paginatedUsers = leaderboard.slice(
+  const paginatedUsers = filteredLeaderboard.slice(
     (currentPage - 1) * usersPerPage,
     currentPage * usersPerPage
   );
@@ -99,6 +105,14 @@ function Leaderboard() {
       <Title order={2} mb="md">
         Leaderboard
       </Title>
+
+      <TextInput
+          placeholder="Search by username"
+          value={searchQuery ?? ""}
+          onChange={(e) => setSearchQuery(e.currentTarget.value)}
+          mb="md" 
+          size="md"
+      />
 
       <Card withBorder shadow="sm" my="md" padding={0}>
         <Table highlightOnHover verticalSpacing="md">
