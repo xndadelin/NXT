@@ -219,7 +219,13 @@ export default function ChallengePage() {
                 }}
               >
                 <TextInput
-                  placeholder={done ? challenge.has_ended === true ? "Contest has ended" : "Challenge completed": "Enter flag"}
+                  placeholder={
+                    challenge.has_ended === true
+                      ? "Contest has ended"
+                      : done
+                        ? "Challenge completed"
+                        : "Enter flag"
+                  }
                   variant="filled"
                   radius="md"
                   size="md"
