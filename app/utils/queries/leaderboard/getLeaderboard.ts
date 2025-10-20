@@ -15,7 +15,9 @@ export interface Submission {
   challenges: {
     id: string;
     points: number;
+    title?: string;
   } | null;
+  updated_at: Date;
 }
 
 export function useLeaderboard() {
@@ -31,7 +33,7 @@ export function useLeaderboard() {
         setLoading(true);
         const { data, error } = await supabase
           .from("submissions")
-          .select("user_id, users(username), challenges(points, id)")
+          .select("user_id, users(username), challenges(points, id), updated_at")
           .eq('done', true)
           .filter('contest_id', 'is', null);
 

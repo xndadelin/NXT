@@ -14,11 +14,14 @@ import { useLeaderboard } from "../utils/queries/leaderboard/getLeaderboard";
 import Loading from "../components/ui/Loading";
 import { Error } from "../components/ui/Error";
 import { useState } from "react";
+import { useRecentActivity } from "../utils/queries/leaderboard/useRecentActivity";
+import Link from "next/link";
 
 function Leaderboard() {
   const { leaderboard, loading, error } = useLeaderboard();
   const [activePage, setActivePage] = useState<number>(1);
   const usersPerPage = 10;
+  const { recent, loading: recentLoading } = useRecentActivity();
 
   if (loading) return <Loading />;
   if (error) return <Error number={500} />;
@@ -97,7 +100,7 @@ function Leaderboard() {
         Leaderboard
       </Title>
 
-      <Card withBorder shadow="sm" padding={0}>
+      <Card withBorder shadow="sm" my="md" padding={0}>
         <Table highlightOnHover verticalSpacing="md">
           <Table.Thead>
             <Table.Tr>
@@ -136,6 +139,48 @@ function Leaderboard() {
           </Box>
         )}
       </Card>
+      <Title order={3} mt="xl" mb="xs" style={{
+        maxHeight: '500px', overflowy: 'auto'
+      }}>
+        Live activity (last 24 hours)
+      </Title>
+      <Group dir="column" gap={0} style={{
+        overflow: 'hidden'
+      }} >
+        {recent.map((sub) => (
+          <Card
+            key={sub.user_id + sub.updated_at.toString()}
+            style={{
+              backgroundColor: '#1b4332',
+              color: '#d8f3dc',
+              borderRadius: 0,
+              borderBottom: '1px solid #2d6a4f',
+              transition: 'background-color 0.3s ease',
+              width: '100%'
+            }}
+            p={"sm"}
+            withBorder={false}
+            onMouseEnter={(e) => (
+              e.currentTarget.style.backgroundColor = '#2d6a4f'
+            )}
+            onMouseLeave={(e) => (
+              e.currentTarget.style.backgroundColor = '#1b4332'
+            )}
+          >
+            <Group justify="space-between" gap={0} style={{
+              width: '100%'
+            }}> 
+              <Text fw={600} style={{
+                width: '100%'
+              }}>
+                {sub.users?.username} completed the challenge <Link style={{
+                  color: '#95d5b2', textDecoration: 'none'
+                }} href={`/challenges/${sub.challenges?.id}`}>{sub.challenges?.title}</Link> worth {sub.challenges?.points} points!
+              </Text>
+            </Group>
+          </Card>
+        ))}
+      </Group>
     </Container>
   );
 }
