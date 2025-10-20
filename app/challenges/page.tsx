@@ -51,6 +51,7 @@ function Challenges() {
   const [filterCategory, setFilterCategory] = useState<string[]>([]);
   const [activePage, setActivePage] = useState(1);
   const itemsPerPage = 20;
+  const [filterStatus, setFilterStatus] = useState<"all" | "solved" | "unsolved">('all')
 
   useEffect(() => {
     if (challenges && challenges.length > 0) {
@@ -67,12 +68,19 @@ function Challenges() {
           filterDifficulty.length === 0 ||
           filterDifficulty.includes(challenge.difficulty);
 
-        return matchesSearch && matchesCategory && matchesDifficulty;
+        const matchesStatus =
+          filterStatus === 'all'
+            ? true 
+            : filterStatus === 'solved'
+            ? solvedChallenges?.includes(challenge.id)
+            : !solvedChallenges?.includes(challenge.id);
+
+        return matchesSearch && matchesCategory && matchesDifficulty && matchesStatus;
       });
       setSortedChallenges(filteredChallenges);
       setActivePage(1);
     }
-  }, [challenges, searchTerm, filterCategory, filterDifficulty]);
+  }, [challenges, searchTerm, filterCategory, filterDifficulty, filterStatus]);
 
   if (loading) return <Loading />;
   if (error) return <Error number={500} />;
@@ -236,6 +244,7 @@ function Challenges() {
     setFilterCategory([]);
     setFilterDifficulty([]);
     setSearchTerm("");
+    setFilterStatus("all");
   };
 
   return (
@@ -304,8 +313,6 @@ function Challenges() {
                   </Menu.Item>
                 ))}
 
-                <Divider my="xs" />
-
                 <Menu.Label>Filter by category</Menu.Label>
                 {categories.map((category) => (
                   <Menu.Item
@@ -329,6 +336,32 @@ function Challenges() {
 
                 <Divider my="xs" />
 
+                <Divider my="xs" />
+
+                <Menu.Label>Filter by status</Menu.Label>
+                <Menu.Item
+                  leftSection={
+                    <Checkbox
+                      checked={filterStatus === "solved"}
+                      onChange={() => setFilterStatus("solved")}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  }
+                >
+                    Solved
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={
+                    <Checkbox
+                      checked={filterStatus === "unsolved"}
+                      onChange={() => setFilterStatus("unsolved")}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  }
+                >
+                    Unsolved
+                </Menu.Item>
+
                 <Menu.Item
                   color="blue"
                   disabled={
@@ -340,6 +373,7 @@ function Challenges() {
                 >
                   Reset all filters
                 </Menu.Item>
+
               </Menu.Dropdown>
             </Menu>
 
