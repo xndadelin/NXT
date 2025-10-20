@@ -6,6 +6,9 @@ export interface LeaderboardUser {
   username: string;
   points: number;
   blood: number;
+  tries: number;
+  completedChallenges: number;
+  notCompletedChallenges: number;
 }
 
 export interface Submission {
@@ -20,6 +23,8 @@ export interface Submission {
   } | null;
   updated_at: Date;
   blood: boolean;
+  done: boolean;
+  tries: number;
 }
 
 export function useLeaderboard() {
@@ -35,8 +40,7 @@ export function useLeaderboard() {
         setLoading(true);
         const { data, error } = await supabase
           .from("submissions")
-          .select("user_id, users(username), challenges(points, id), updated_at, blood")
-          .eq('done', true)
+          .select("user_id, users(username), challenges(points, id), updated_at, blood, done, tries")
           .filter('contest_id', 'is', null);
 
         if (error) {
@@ -47,7 +51,6 @@ export function useLeaderboard() {
         const submissions = data as unknown as Submission[]
 
         (submissions)?.forEach((submission) => {
-          console.log(submission)
           const userId = submission.user_id;
           const username = submission.users?.username ?? "unk";
           const points = submission.challenges?.points ?? 0;
@@ -58,10 +61,19 @@ export function useLeaderboard() {
               username,
               points: 0,
               blood: 0,
+              tries: 0,
+              completedChallenges: 0,
+              notCompletedChallenges: 0
             }
           }
-          leaderboardMap[userId].points += points;
-          leaderboardMap[userId].blood += submission.blood ? 1 : 0 
+          leaderboardMap[userId].points += submission.done ? points: 0;
+          leaderboardMap[userId].blood += submission.blood ? 1 : 0 ;
+          leaderboardMap[userId].tries += submission.tries || 0;
+          if(submission.done) {
+            leaderboardMap[userId].completedChallenges += 1;
+          } else {
+            leaderboardMap[userId].notCompletedChallenges += 1;
+          }
         })
 
 

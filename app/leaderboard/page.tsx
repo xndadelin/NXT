@@ -29,6 +29,8 @@ function Leaderboard() {
      user.username.toLowerCase().includes(searchQuery.toLowerCase())
    )
 
+   console.log(filteredLeaderboard);
+
   if (loading) return <Loading />;
   if (error) return <Error number={500} />;
 
@@ -78,6 +80,16 @@ function Leaderboard() {
             textAlign: 'center'
           }} >
             {user.blood}
+          </Text>
+        </Table.Td>
+        <Table.Td>
+          <Text fw={500} size="md" style={{
+            textAlign: 'center'
+          }}>
+            {(user.completedChallenges + user.tries > 0)
+              ? ((user.completedChallenges / user.tries) * 100).toFixed(2) + '%'
+              : 'N/A'
+            }
           </Text>
         </Table.Td>
         <Table.Td style={{ textAlign: "right", width: "100px" }}>
@@ -130,6 +142,7 @@ function Leaderboard() {
               </Table.Th>
               <Table.Th>Username</Table.Th>
               <Table.Th style={{ textAlign: 'center'}}>Bloods</Table.Th>
+              <Table.Th style={{ textAlign: 'center'}}>Accuracy</Table.Th>
               <Table.Th style={{ textAlign: "right", width: "100px" }}>
                 Points
               </Table.Th>
