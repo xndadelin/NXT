@@ -5,6 +5,7 @@ export interface LeaderboardUser {
   id: string;
   username: string;
   points: number;
+  blood: number;
 }
 
 export interface Submission {
@@ -18,6 +19,7 @@ export interface Submission {
     title?: string;
   } | null;
   updated_at: Date;
+  blood: boolean;
 }
 
 export function useLeaderboard() {
@@ -33,7 +35,7 @@ export function useLeaderboard() {
         setLoading(true);
         const { data, error } = await supabase
           .from("submissions")
-          .select("user_id, users(username), challenges(points, id), updated_at")
+          .select("user_id, users(username), challenges(points, id), updated_at, blood")
           .eq('done', true)
           .filter('contest_id', 'is', null);
 
@@ -54,10 +56,12 @@ export function useLeaderboard() {
             leaderboardMap[userId] = {
               id: userId,
               username,
-              points: 0
+              points: 0,
+              blood: 0,
             }
           }
           leaderboardMap[userId].points += points;
+          leaderboardMap[userId].blood += submission.blood ? 1 : 0 
         })
 
 

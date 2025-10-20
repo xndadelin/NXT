@@ -73,6 +73,13 @@ function Leaderboard() {
             {user.username}
           </Text>
         </Table.Td>
+        <Table.Td>
+          <Text fw={500} size="md" style={{
+            textAlign: 'center'
+          }} >
+            {user.blood}
+          </Text>
+        </Table.Td>
         <Table.Td style={{ textAlign: "right", width: "100px" }}>
           <Text
             fw={500}
@@ -122,6 +129,7 @@ function Leaderboard() {
                 Rank
               </Table.Th>
               <Table.Th>Username</Table.Th>
+              <Table.Th style={{ textAlign: 'center'}}>Bloods</Table.Th>
               <Table.Th style={{ textAlign: "right", width: "100px" }}>
                 Points
               </Table.Th>

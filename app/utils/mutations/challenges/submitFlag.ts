@@ -12,6 +12,7 @@ export async function submitFlag(challengeId: string, flag: string, contest?: st
   if (!id) throw new Error("User ID not found");
 
   const isCorrect = await checkFlag(challengeId, flag);
+  const challengeHasBlood = await supabase.from('submissions').select('id').eq('challenge', challengeId).eq('blood', true);
 
   const { data: existentSubmission, error: errorFetch } = await supabase
     .from("submissions")
@@ -63,7 +64,8 @@ export async function submitFlag(challengeId: string, flag: string, contest?: st
         done: true,
         tries: 1,
         updated_at: new Date(),
-        contest_id: contest || null
+        contest_id: contest || null,
+        blood: challengeHasBlood.data && challengeHasBlood.data.length ? false : true
       });
 
       if (insertError) {
