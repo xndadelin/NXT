@@ -129,7 +129,7 @@ function Challenges() {
         </Badge>
       </Table.Td>
       <Table.Td>{challenge.category}</Table.Td>
-      <Table.Td>{challenge.accuracy}%</Table.Td>
+      <Table.Td>{challenge.accuracy?.toFixed(2)}%</Table.Td>
       <Table.Td>{challenge.points}</Table.Td>
       <Table.Td>
         {solvedChallenges?.includes(challenge.id) ? "✅" : "❌"}
