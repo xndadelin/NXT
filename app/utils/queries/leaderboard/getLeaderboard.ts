@@ -11,11 +11,11 @@ export interface Submission {
   user_id: string;
   users: {
     username: string;
-  };
+  } | null;
   challenges: {
     id: string;
     points: number;
-  };
+  } | null;
 }
 
 export function useLeaderboard() {
@@ -33,15 +33,16 @@ export function useLeaderboard() {
           .from("submissions")
           .select("user_id, users(username), challenges(points, id)")
           .eq('done', true)
-          .is('contest_id', null);
+          .filter('contest_id', 'is', null);
 
         if (error) {
           throw error;
         }
 
         const leaderboardMap: Record<string, LeaderboardUser> = {};
+        const submissions = data as unknown as Submission[]
 
-        (data)?.forEach((submission : any) => {
+        (submissions)?.forEach((submission) => {
           console.log(submission)
           const userId = submission.user_id;
           const username = submission.users?.username ?? "unk";
