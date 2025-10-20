@@ -27,9 +27,33 @@ function Leaderboard() {
 
   const filteredLeaderboard = leaderboard.filter(user =>
      user.username.toLowerCase().includes(searchQuery.toLowerCase())
-   )
+  )
+  
+  const [sortBy, setSortBy] = useState<"points" | "blood" | "accuracy">("points");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
-   console.log(filteredLeaderboard);
+  function getAccuracy(user: {
+    completedChallenges: number;
+    tries: number;
+  }): number {
+    return user.tries > 0 ? user.completedChallenges / user.tries : 0;
+  }
+
+  const sortedLeaderboard = [...filteredLeaderboard].sort((a, b) => {
+    let av: number, bv: number;
+    if(sortBy === 'points') {
+      av = a.points
+      bv = b.points
+    } else if (sortBy === 'blood') {
+      av = a.blood
+      bv = b.blood
+    } else {
+      av = getAccuracy(a)
+      bv = getAccuracy(b)
+    }
+    return sortDirection === 'asc' ? av - bv : bv - av;
+  })
+  
 
   if (loading) return <Loading />;
   if (error) return <Error number={500} />;
@@ -37,7 +61,7 @@ function Leaderboard() {
   const totalPages = Math.max(1, Math.ceil(filteredLeaderboard.length / usersPerPage));
   const currentPage = activePage > totalPages ? totalPages : activePage;
 
-  const paginatedUsers = filteredLeaderboard.slice(
+  const paginatedUsers = sortedLeaderboard.slice(
     (currentPage - 1) * usersPerPage,
     currentPage * usersPerPage
   );
@@ -126,11 +150,11 @@ function Leaderboard() {
       </Title>
 
       <TextInput
-          placeholder="Search by username"
-          value={searchQuery ?? ""}
-          onChange={(e) => setSearchQuery(e.currentTarget.value)}
-          mb="md" 
-          size="md"
+        placeholder="Search by username"
+        value={searchQuery ?? ""}
+        onChange={(e) => setSearchQuery(e.currentTarget.value)}
+        mb="md"
+        size="md"
       />
 
       <Card withBorder shadow="sm" my="md" padding={0}>
@@ -141,10 +165,42 @@ function Leaderboard() {
                 Rank
               </Table.Th>
               <Table.Th>Username</Table.Th>
-              <Table.Th style={{ textAlign: 'center'}}>Bloods</Table.Th>
-              <Table.Th style={{ textAlign: 'center'}}>Accuracy</Table.Th>
-              <Table.Th style={{ textAlign: "right", width: "100px" }}>
-                Points
+              <Table.Th
+                onClick={() => {
+                  if (sortBy === "blood") {
+                    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+                  }
+                  setSortBy("blood");
+                }}
+                style={{ textAlign: "center", cursor: "pointer" }}
+              >
+                Bloods { sortBy === 'blood' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }
+              </Table.Th>
+              <Table.Th
+                onClick={() => {
+                  if (sortBy === "accuracy") {
+                    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+                  }
+                  setSortBy("accuracy");
+                }}
+                style={{ textAlign: "center", cursor: "pointer" }}
+              >
+                Accuracy { sortBy === 'accuracy' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }
+              </Table.Th>
+              <Table.Th
+                onClick={() => {
+                  if (sortBy === "points") {
+                    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+                  }
+                  setSortBy("points");
+                }}
+                style={{
+                  textAlign: "right",
+                  width: "100px",
+                  cursor: "pointer",
+                }}
+              >
+                Points { sortBy === 'points' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }
               </Table.Th>
             </Table.Tr>
           </Table.Thead>
@@ -174,43 +230,68 @@ function Leaderboard() {
           </Box>
         )}
       </Card>
-      <Title order={3} mt="xl" mb="xs" style={{
-        maxHeight: '500px', overflowy: 'auto'
-      }}>
+      <Title
+        order={3}
+        mt="xl"
+        mb="xs"
+        style={{
+          maxHeight: "500px",
+          overflowy: "auto",
+        }}
+      >
         Live activity (last 24 hours)
       </Title>
-      <Group dir="column" gap={0} style={{
-        overflow: 'hidden'
-      }} >
+      <Group
+        dir="column"
+        gap={0}
+        style={{
+          overflow: "hidden",
+        }}
+      >
         {recent.map((sub) => (
           <Card
             key={sub.user_id + sub.updated_at.toString()}
             style={{
-              backgroundColor: '#1b4332',
-              color: '#d8f3dc',
+              backgroundColor: "#1b4332",
+              color: "#d8f3dc",
               borderRadius: 0,
-              borderBottom: '1px solid #2d6a4f',
-              transition: 'background-color 0.3s ease',
-              width: '100%'
+              borderBottom: "1px solid #2d6a4f",
+              transition: "background-color 0.3s ease",
+              width: "100%",
             }}
             p={"sm"}
             withBorder={false}
-            onMouseEnter={(e) => (
-              e.currentTarget.style.backgroundColor = '#2d6a4f'
-            )}
-            onMouseLeave={(e) => (
-              e.currentTarget.style.backgroundColor = '#1b4332'
-            )}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#2d6a4f")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "#1b4332")
+            }
           >
-            <Group justify="space-between" gap={0} style={{
-              width: '100%'
-            }}> 
-              <Text fw={600} style={{
-                width: '100%'
-              }}>
-                {sub.users?.username} completed the challenge <Link style={{
-                  color: '#95d5b2', textDecoration: 'none'
-                }} href={`/challenges/${sub.challenges?.id}`}>{sub.challenges?.title}</Link> worth {sub.challenges?.points} points!
+            <Group
+              justify="space-between"
+              gap={0}
+              style={{
+                width: "100%",
+              }}
+            >
+              <Text
+                fw={600}
+                style={{
+                  width: "100%",
+                }}
+              >
+                {sub.users?.username} completed the challenge{" "}
+                <Link
+                  style={{
+                    color: "#95d5b2",
+                    textDecoration: "none",
+                  }}
+                  href={`/challenges/${sub.challenges?.id}`}
+                >
+                  {sub.challenges?.title}
+                </Link>{" "}
+                worth {sub.challenges?.points} points!
               </Text>
             </Group>
           </Card>
