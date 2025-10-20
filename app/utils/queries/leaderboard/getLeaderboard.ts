@@ -7,6 +7,17 @@ export interface LeaderboardUser {
   points: number;
 }
 
+export interface Submission {
+  user_id: string;
+  users: {
+    username: string;
+  };
+  challenges: {
+    id: string;
+    points: number;
+  };
+}
+
 export function useLeaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -19,15 +30,35 @@ export function useLeaderboard() {
       try {
         setLoading(true);
         const { data, error } = await supabase
-          .from("users")
-          .select("id, username, points")
-          .order("points", { ascending: false });
+          .from("submissions")
+          .select("user_id, users(username), challenges(points, id)")
+          .eq('done', true)
+          .is('contest_id', null);
 
         if (error) {
           throw error;
         }
 
-        setLeaderboard(data || []);
+        const leaderboardMap: Record<string, LeaderboardUser> = {};
+
+        (data)?.forEach((submission : any) => {
+          console.log(submission)
+          const userId = submission.user_id;
+          const username = submission.users?.username ?? "unk";
+          const points = submission.challenges?.points ?? 0;
+
+          if (!leaderboardMap[userId]) {
+            leaderboardMap[userId] = {
+              id: userId,
+              username,
+              points: 0
+            }
+          }
+          leaderboardMap[userId].points += points;
+        })
+
+
+        setLeaderboard(leaderboardMap ? Object.values(leaderboardMap).sort((a, b) => b.points - a.points) : []);
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err));
       } finally {
@@ -44,7 +75,7 @@ export function useLeaderboard() {
         {
           event: "*",
           schema: "public",
-          table: "users",
+          table: "submissions",
         },
         () => {
           fetchLeaderboard();
