@@ -35,6 +35,7 @@ export interface Challenge {
   difficulty: string;
   category: string;
   points: number;
+  accuracy?: number;
 }
 
 function Challenges() {
@@ -46,7 +47,7 @@ function Challenges() {
   const [filterDifficulty, setFilterDifficulty] = useState<string[]>([]);
   const [filterCategory, setFilterCategory] = useState<string[]>([]);
   const [activePage, setActivePage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   useEffect(() => {
     if (challenges && challenges.length > 0) {
@@ -128,6 +129,7 @@ function Challenges() {
         </Badge>
       </Table.Td>
       <Table.Td>{challenge.category}</Table.Td>
+      <Table.Td>{challenge.accuracy}%</Table.Td>
       <Table.Td>{challenge.points}</Table.Td>
       <Table.Td>
         {solvedChallenges?.includes(challenge.id) ? "✅" : "❌"}
@@ -145,7 +147,7 @@ function Challenges() {
         ? -1
         : 1;
 
-    const newSortDirection = [0, 0, 0, 0, 0];
+    const newSortDirection = [0, 0, 0, 0, 0, 0];
     newSortDirection[colIndex] = newDirection;
     setSortDirection(newSortDirection);
 
@@ -184,6 +186,11 @@ function Challenges() {
         });
         setSortedChallenges(newSortedChallenges);
         break;
+      case "Accuracy": 
+        newSortedChallenges.sort((a, b) => {
+          return newDirection * ((a.accuracy || 0) - (b.accuracy || 0));
+        })
+        setSortedChallenges(newSortedChallenges)
     }
     setActivePage(1);
   };
@@ -366,11 +373,22 @@ function Challenges() {
                 </Table.Th>
                 <Table.Th
                   style={{ cursor: "pointer", width: "120px" }}
-                  onClick={() => onSort("Points", 4)}
+                  onClick={() => onSort("Accuracy", 4)}
+                >
+                  <Group gap={5}>
+                    <Text>
+                      Solve rate
+                    </Text>
+                    {renderSortIcon(4)}
+                  </Group>
+                </Table.Th>
+                <Table.Th
+                  style={{ cursor: "pointer", width: "120px" }}
+                  onClick={() => onSort("Points", 5)}
                 >
                   <Group gap={5}>
                     <Text>Points</Text>
-                    {renderSortIcon(4)}
+                    {renderSortIcon(5)}
                   </Group>
                 </Table.Th>
                 <Table.Th style={{ width: "100px" }}>
@@ -397,6 +415,7 @@ function Challenges() {
           </Group>
         </Group>
       </Card>
+      <div style={{ height: '2rem'}}></div>
     </Container>
   );
 }

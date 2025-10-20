@@ -10,6 +10,7 @@ export interface Challenge {
   category: string;
   points: number;
   created_at: string;
+  accuracy?: number;
 }
 
 export default function useChallenges({ method }: { method: "public" | "private" }) {
@@ -32,7 +33,33 @@ export default function useChallenges({ method }: { method: "public" | "private"
           throw error;
         }
 
-        setChallenges(data || []);
+        const { data: submissions, error: subError } = await supabase.from('submissions').select('challenge, done, tries');
+        if(subError) throw subError;
+
+        const statsMap: Record<string, { triesCount: number; solvesCount: number }> = {};
+        submissions?.forEach((submission) => {
+          if(!statsMap[submission.challenge]) {
+            statsMap[submission.challenge] = {
+              triesCount: 0,
+              solvesCount: 0
+            }
+          }
+          statsMap[submission.challenge].triesCount += submission.tries || 0;
+          if(submission.done) {
+            statsMap[submission.challenge].solvesCount += 1
+          }
+        })
+
+        const challengesWithStats = (data || []).map((challenge) => {
+          const stats = statsMap[challenge.id] || { triesCount: 0, solvesCount: 0 };
+          const accuracy = stats.triesCount > 0 ? (stats.solvesCount / stats.triesCount) : 0; 
+          return {
+            ...challenge, 
+            accuracy: accuracy * 100
+          }
+        })
+
+        setChallenges(challengesWithStats);
         const { data: userData, error: userError } =
           await supabase.auth.getUser();
         if (userError) {
