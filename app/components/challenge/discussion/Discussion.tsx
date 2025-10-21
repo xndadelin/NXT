@@ -78,6 +78,7 @@ export default function Discussion({ challengeId }: DiscussionProps) {
       });
       refetch();
     } catch (error) {
+      console.error(error)
       notifications.show({
         title: "Error",
         message: "Failed to post",

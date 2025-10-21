@@ -1,7 +1,6 @@
 'use client';
 
-import { Container, Title, Group, Card, Anchor, Text, Stack, Box, Divider } from "@mantine/core";
-import { useState } from "react";
+import { Container, Title, Anchor, Text, Stack, Box, Divider } from "@mantine/core";
 import useWriteups from "../utils/queries/writeups/useWriteups";
 import Loading from "../components/ui/Loading";
 import { Error } from "../components/ui/Error";

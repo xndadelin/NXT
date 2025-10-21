@@ -23,17 +23,13 @@ import { useParams } from "next/navigation";
 import useChallenge from "@/app/utils/queries/challenges/getChallenge";
 import Loading from "@/app/components/ui/Loading";
 import { Error } from "@/app/components/ui/Error";
-import DOMPurify from "dompurify";
 import Link from "next/link";
 import {
-  IconBook,
-  IconBulb,
   IconCalendar,
   IconCategory,
   IconDots,
   IconExternalLink,
   IconFlag,
-  IconMessageCircle,
   IconShield,
   IconTrash,
   IconTrophy,
@@ -59,7 +55,7 @@ export default function ChallengePage() {
   const { user } = useUser();
   const router = useRouter();
   const [flagValue, setFlagValue] = useState<string>("");
-  const { votes, userVote, loading: votesLoading, vote, votingError, fetchVotes } = useVoteChallenge(challengeId, user?.id)
+  const { votes, userVote, vote, votingError, fetchVotes } = useVoteChallenge(challengeId, user?.id)
 
   useEffect(() => {
     async function fetchDone() {

@@ -5,7 +5,7 @@ import useUser from "@/app/utils/queries/user/useUser";
 import { Error } from "@/app/components/ui/Error";
 import { Container, TextInput, Title, Textarea, MultiSelect, Group, Text, NumberInput, Button } from "@mantine/core";
 import useChallenges from "@/app/utils/queries/challenges/getChallenges";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "@mantine/form";
 import { DateTimePicker } from "@mantine/dates"
 import '@mantine/dates/styles.css';
@@ -20,29 +20,6 @@ interface ChallengeData {
         max_points: number;
         decay: number;
     };
-}
-
-interface Contest {
-    id: string;
-    title: string;
-    description: string;
-    start_time: string;
-    end_time: string;
-    created_at: string;
-    banner: string;
-    participants: string[];
-    has_ended?: boolean;
-    rules: string;
-    challenges?: {
-        challenge_id: string;
-        title: string;
-        difficulty: string;
-        category: string;
-        points: number;
-        max_points: number;
-        decay: number;
-    } []
-    key: string;
 }
 
 export default function CreateContest() {

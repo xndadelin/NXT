@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { createClient } from "../../supabase/client";
-import useUser from "../user/useUser";
 import { notifications } from "@mantine/notifications";
 
 interface Contest {

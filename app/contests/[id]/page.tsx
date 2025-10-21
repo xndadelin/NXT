@@ -10,7 +10,6 @@ import {
   Image,
   Title,
   Text,
-  Divider,
   SimpleGrid,
   Badge,
   Group,
@@ -49,7 +48,7 @@ export default function ContestPage() {
   const { contest, loading, error } = useContest({
     contestId: params.id as string,
   });
-  const { leaderboard, error: lbError, loading: lbLoading } = useLeaderboard(params.id as string)
+  const { leaderboard } = useLeaderboard(params.id as string)
   console.log(leaderboard)
 
   if (loading) return <Loading />;
@@ -159,7 +158,7 @@ export default function ContestPage() {
                   </Table.Td>
                 </Table.Tr>
               ) : (
-                leaderboard.map((entry, index) => (
+                leaderboard.map((entry) => (
                   <Table.Tr key={entry.user_id}>
                     <Table.Td>
                       {entry.rank === 1 && <Badge color="yellow">🥇</Badge>}
