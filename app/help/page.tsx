@@ -13,6 +13,9 @@ import {
 } from "@mantine/core";
 import { IconHelpCircle, IconHelpHexagon } from "@tabler/icons-react";
 import { useState } from "react";
+import { BlockMath } from "react-katex";
+import "katex/dist/katex.min.css"
+
 
 export default function HelpPage() {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -88,6 +91,13 @@ export default function HelpPage() {
           "Yes, each contest may have its own set of rules and guidelines. Make sure to read the contest description and rules before participating to ensure a fair and enjoyable experience for all participants.",
       },
     ],
+    "Dynamic points": [
+      {
+        question: "What are dynamic points?",
+        answer:
+          "Dynamic points are a scoring system where the points awarded for solving a challenge decrease as more participants solve it. So, challenges with more solves will be less valuable than challenges with less solves. The natural logarithm in the formula means that the points decrease more slowly as the number of solves increases, preventing the points from dropping too quickly.",
+      },
+    ],
     "Help & Support": [
       {
         question: "How can I report a bug or suggest a feature?",
@@ -103,12 +113,22 @@ export default function HelpPage() {
     ],
   };
 
-  const filteredFaq = Object.fromEntries(
-    Object.entries(faq).map(([category, questions]) => [
+  const allQuestions = Object.entries(faq).flatMap(([category, questions]) =>
+    questions.map((q) => ({
+      ...q,
       category,
-      questions.filter((q) => (q.question ?? q.general).toLowerCase().includes(searchQuery.toLowerCase()))
-    ])
-  )
+      questionText: q.question ?? q.general,
+      answerText: q.answer,
+    }))
+  );
+
+  const filteredQuery = allQuestions.filter((q) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      q.questionText.toLowerCase().includes(query) ||
+      q.answerText.toLowerCase().includes(query)
+    );
+  });
 
   return (
     <div>
@@ -148,7 +168,7 @@ export default function HelpPage() {
               placeholder="Search questions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              w="400px"
+              w={400}
             />
             <Button leftSection={<IconHelpHexagon size={18} />}>
               Contact support
@@ -158,30 +178,61 @@ export default function HelpPage() {
       </Container>
       <Divider my={80} />
       <Container pb={80}>
-        {Object.entries(filteredFaq).map(([category, questions]) => (
-          questions.length > 0 && (
-            <Box key={category} mb={40}>
-              <Title order={2} mb={10}>
-                {category}
-              </Title>
+        {searchQuery
+          ? filteredQuery.length > 0
+            ? (
               <Accordion variant="separated" chevronPosition="right">
-                {questions.map((q, index) => (
-                   <Accordion.Item key={index} value={q.question ?? q.general}>
+                {filteredQuery.map((q, index) => (
+                  <Accordion.Item key={index} value={q.questionText}>
                     <Accordion.Control>
-                      {q.question ?? q.general}
+                      {q.questionText}
+                      <Text c="dimmed" size="sm" mt={2}>
+                        {q.category}
+                      </Text>
                     </Accordion.Control>
                     <Accordion.Panel>
                       <Text
-                        dangerouslySetInnerHTML={{ __html: q.answer }}
-                        style={{ whiteSpace: 'pre-wrap'}}
+                        dangerouslySetInnerHTML={{ __html: q.answerText }}
+                        style={{ whiteSpace: "pre-wrap" }}
                       />
+                      {q.questionText === "What are dynamic points?" && (
+                        <BlockMath math={`\\text{points} = \\max\\left(\\text{min}, \\frac{\\text{base}}{1 + \\ln(\\text{solves})}\\right)`} />
+                      )}
                     </Accordion.Panel>
-                   </Accordion.Item>
+                  </Accordion.Item>
                 ))}
               </Accordion>
-            </Box>
-          )
-        ))}
+            )
+            : (
+              <Text ta="center" c="dimmed" fw={500} py={40}>
+                No questions found for your search query.
+              </Text>
+            )
+          : Object.entries(faq).map(([category, questions]) =>
+              questions.length > 0 && (
+                <Box key={category} mb={40}>
+                  <Title order={2} mb={10}>
+                    {category}
+                  </Title>
+                  <Accordion variant="separated" chevronPosition="right">
+                    {questions.map((q, index) => (
+                      <Accordion.Item key={index} value={q.question ?? q.general}>
+                        <Accordion.Control>
+                          {q.question ?? q.general}
+                        </Accordion.Control>
+                        <Accordion.Panel>
+                          <Text
+                            dangerouslySetInnerHTML={{ __html: q.answer }}
+                            style={{ whiteSpace: "pre-wrap" }}
+                          />
+                        </Accordion.Panel>
+                      </Accordion.Item>
+                    ))}
+                  </Accordion>
+                </Box>
+              )
+            )
+        }
       </Container>
     </div>
   );
