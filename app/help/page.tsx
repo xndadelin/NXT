@@ -9,6 +9,7 @@ import {
   TextInput,
   Button,
   Divider,
+  Accordion,
 } from "@mantine/core";
 import { IconHelpCircle, IconHelpHexagon } from "@tabler/icons-react";
 import { useState } from "react";
@@ -156,6 +157,32 @@ export default function HelpPage() {
         </Box>
       </Container>
       <Divider my={80} />
+      <Container pb={80}>
+        {Object.entries(filteredFaq).map(([category, questions]) => (
+          questions.length > 0 && (
+            <Box key={category} mb={40}>
+              <Title order={2} mb={10}>
+                {category}
+              </Title>
+              <Accordion variant="separated" chevronPosition="right">
+                {questions.map((q, index) => (
+                   <Accordion.Item key={index} value={q.question ?? q.general}>
+                    <Accordion.Control>
+                      {q.question ?? q.general}
+                    </Accordion.Control>
+                    <Accordion.Panel>
+                      <Text
+                        dangerouslySetInnerHTML={{ __html: q.answer }}
+                        style={{ whiteSpace: 'pre-wrap'}}
+                      />
+                    </Accordion.Panel>
+                   </Accordion.Item>
+                ))}
+              </Accordion>
+            </Box>
+          )
+        ))}
+      </Container>
     </div>
   );
 }
