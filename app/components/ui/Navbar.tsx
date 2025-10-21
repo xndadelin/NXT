@@ -12,7 +12,7 @@ import Header from "../header/Header";
 import { Error } from "./Error";
 
 const Navbar: React.FC = () => {
-  const { user, error } = useUser();
+  const { user, error, loading } = useUser();
   const [opened, { toggle }] = useDisclosure(false);
   const [active, setActive] = useState("Home");
 
@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
 
   if (error) return <Error number={500} />;
 
-  return !user ? (
+  return !user && !loading ? (
     <header className={classes.header}>
       <Container className={classes.inner}>
         <Link

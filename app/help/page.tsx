@@ -13,7 +13,6 @@ import {
 } from "@mantine/core";
 import { IconHelpCircle, IconHelpHexagon } from "@tabler/icons-react";
 import { useState } from "react";
-
 import { BlockMath } from "react-katex";
 import "katex/dist/katex.min.css"
 
