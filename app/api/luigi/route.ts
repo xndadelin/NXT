@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@/app/utils/supabase/server";
 import { cookies } from "next/headers";
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
     const body = await request.json();
     const prompt = body.prompt;
     const supabase = await createClient();
@@ -36,11 +36,16 @@ export async function GET(request: NextRequest) {
         const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
                 model: 'deepseek-chat',
-                prompt: prompt
+                messages: [{
+                    role: 'user',
+                    content: prompt
+                }],
+                temperature: 0.7
             })
         })
 
@@ -53,7 +58,7 @@ export async function GET(request: NextRequest) {
             })
         }
         const data = await response.json();
-        return NextResponse.json({ data })
+        return NextResponse.json({ data: data?.choices?.[0]?.message?.content?.trim?.() ?? "" })
 
 
     } catch(error) {
