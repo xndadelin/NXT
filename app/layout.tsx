@@ -10,6 +10,7 @@ import {
 import { Navbar } from "./components/ui/Navbar";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
+import LuigiWidget from "./components/ai/LuigiWidget";
 
 export const metadata: Metadata = {
   title: "NextCTF",
@@ -36,6 +37,7 @@ export default function RootLayout({
           <Navbar />
           {children}
           <Notifications position={"bottom-right"} />
+          <LuigiWidget />
         </MantineProvider>
       </body>
     </html>

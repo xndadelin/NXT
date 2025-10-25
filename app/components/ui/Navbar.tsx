@@ -16,7 +16,7 @@ const Navbar: React.FC = () => {
   const [opened, { toggle }] = useDisclosure(false);
   const [active, setActive] = useState("Home");
 
-  const tabs = ["About", "Features", "Community"].map((tab) => (
+  const tabs = ["About", "Features", "Start"].map((tab) => (
     <a
       key={tab}
       href={`/#${tab.toLowerCase()}`}

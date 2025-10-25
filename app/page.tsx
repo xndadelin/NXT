@@ -275,6 +275,7 @@ export default function Home() {
               borderRadius: "16",
               padding: 40,
             }}
+            id="start"
           >
             <Title order={3} style={{ fontSize: "2rem" }}>
               🤠 So, what are you waiting for? Join us and start today!
