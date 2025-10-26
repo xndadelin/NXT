@@ -51,6 +51,7 @@ export default function useUser() {
         setUser(user);
       } catch (error) {
         setError(error instanceof Error ? error.message : String(error));
+        window.location.reload()
       } finally {
         setLoading(false);
       }
