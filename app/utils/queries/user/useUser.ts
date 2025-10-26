@@ -50,8 +50,9 @@ export default function useUser() {
 
         setUser(user);
       } catch (error) {
-        setError(error instanceof Error ? error.message : String(error));
-        console.log(error)
+        if(error.code === 'user_not_found') {
+          setUser(null);
+        } else setError(error instanceof Error ? error.message : String(error));
       } finally {
         setLoading(false);
       }
