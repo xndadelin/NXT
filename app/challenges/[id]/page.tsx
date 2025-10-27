@@ -352,6 +352,8 @@ export default function ChallengePage() {
               fullWidth
               mb="xs"
               leftSection={<IconBook size={14} />}
+              component={Link}
+              href="/writeups"
             >
               Writeups
             </Button>
