@@ -226,6 +226,9 @@ export default function HelpPage() {
                             dangerouslySetInnerHTML={{ __html: q.answer }}
                             style={{ whiteSpace: "pre-wrap" }}
                           />
+                          {q.question === "What are dynamic points?" && (
+                            <BlockMath math={`\\text{points} = \\max\\left(\\text{min}, \\frac{\\text{base}}{1 + \\ln(\\text{solves})}\\right)`} />
+                          )}
                         </Accordion.Panel>
                       </Accordion.Item>
                     ))}
