@@ -16,6 +16,7 @@ import useUser from "@/app/utils/queries/user/useUser";
 import { notifications } from "@mantine/notifications";
 import Loading from "@/app/components/ui/Loading";
 import { Error } from "@/app/components/ui/Error";
+import rehypeSanitize from "rehype-sanitize";
 
 export interface Challenge {
   id: string;
@@ -104,6 +105,9 @@ export default function WriteupFormPage() {
                     value={form.values.contentMarkdown}
                     onChange={(value) => form.setFieldValue("contentMarkdown", value || '')}
                     style={{ background: "var(--mantine-color-dark-8)", marginTop: "0.5rem" }}
+                    previewOptions={{
+                        rehypePlugins: [rehypeSanitize]
+                    }}
                 />
                 <Button type="submit" mt="lg">Submit</Button>
             </form>
